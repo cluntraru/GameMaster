@@ -3,13 +3,13 @@ Virtual Game Master for real-life board games.
 
 ## Directories
 
-###src
+### src
 
 This is where source code goes. Different functionality goes into different subfolders if necessary.
 
-###res
+### res
 This is where you put resources that need to be used by the app.
 
-###aux
+### aux
 
 This is where references and extra information go.

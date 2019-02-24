@@ -6,6 +6,8 @@ NOBODY = "NONE"
 assassinatedPerson = NOBODY
 checkedPerson = NOBODY
 savedPerson = NOBODY
+mutilatedPerson = NOBODY
+mutilatedPlace = NOBODY
 
 def createVotingScreen(player_window, player_names, vote_function): #populates all voting screens
 
@@ -106,7 +108,33 @@ def nightDoctorVote(player_names):
     global savedPerson
     return savedPerson
 
+def nightMutilatorVote(player_names):
 
+    def mutilatorVoteFunction(playerWindow, playerName):
+        def callback():
+            global mutilatedPerson
+            mutilatedPerson = playerName
+            playerWindow.destroy()
 
+        return callback
 
-nightDoctorVote(["Marcel","Ionela","Trump","Putin","Atcineva"])
+    def mutilatorPlaceFunction(playerWindow, placeName):
+        def callback():
+            global mutilatedPlace
+            mutilatedPlace = placeName[0]
+            playerWindow.destroy()
+
+        return callback
+
+    currWindow = Tk()
+    currWindow.title("NIGHT PHASE: " + "Mutilator mutilates: ")
+    createVotingScreen(currWindow, player_names, mutilatorVoteFunction)
+
+    currWindow = Tk()
+    currWindow.title("NIGHT PHASE: " + "Mutilator mutilates: ")
+    createVotingScreen(currWindow, ["Hand", "Mouth"], mutilatorPlaceFunction)
+
+    global mutilaredPerson, mutilatedPlace
+    return (mutilatedPerson,mutilatedPlace)
+
+nightMutilatorVote(["Marcel","Ionela","Trump","Putin","Atcineva"])

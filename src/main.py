@@ -1,6 +1,7 @@
 import random
 import math
 import sys
+import os
 from argparse import ArgumentParser
 
 PLAYER_IDX = 0
@@ -13,6 +14,7 @@ POTATO_IDX = 6
 
 cycle_count = 1
 debug_mode = None
+speak_mode = None
 suicidal_lynched = False
 
 roles_cnt = [0, 0, 0, 0, 0, 0, 0]
@@ -21,11 +23,24 @@ alive_cnt = []
 player_roles = {}
 player_alive = {}
 
+def output(text):
+    if speak_mode:
+        speak(text)
+        print(text)
+    else:
+        print(text)
+
+
+def speak(text):
+    if sys.platform == 'darwin':
+        os.system('say ' + text)
+
+
 def assign_roles():
     # TODO: (Lulu) UI for entering names
     roles_cnt[PLAYER_IDX] = int(input('Enter number of players: '))
     if roles_cnt[PLAYER_IDX] < 5:
-        print('Unfortunately, you can\'t play with less than 5 people :(')
+        output('Unfortunately, you can\'t play with less than 5 people :(')
         return -1;
 
     roles_cnt[ASSN_IDX] = math.floor(1 + (roles_cnt[PLAYER_IDX] - 5) / 4)
@@ -69,9 +84,10 @@ def assign_roles():
         player_roles[curr_name] = role_list.pop(rand_index);
         player_alive[curr_name] = True
 
-    print('\n')
+    # print('\n')
     return 0
     # TODO: (Lulu) Make a UI so that everyone can find out their roles kthxbye
+
 
 def kill(name):
     player_alive[name] = False
@@ -81,7 +97,9 @@ def kill(name):
 
 def role_idx_to_name(idx):
     if idx == 0:
-        print('')
+        if debug_mode:
+            print('DEBUG: Invalid role index')
+        sys.exit()
 
     role_names = ['ERROR', 'assassin', 'policeman', 'suicidal person', 'doctor', 'mutilator', 'townie']
     return role_names[idx]
@@ -135,19 +153,19 @@ def play_night():
 
     # TODO: (Lulu) UI for every night action
     print('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
-    print('Everyone goes to sleep.\n')
+    output('Everyone goes to sleep.\n')
 
     # Assn
-    print('The assassins wake up.')
+    output('The assassins wake up.')
     if assn_turn:
         assassinated = input('Name of assassinee: ')
     else:
         assassinated = None
 
-    print('The assassins go to sleep.\n')
+    output('The assassins go to sleep.\n')
 
     # Police
-    print('The police wake up.')
+    output('The police wake up.')
     if police_turn:
         police_query = input('Person to query: ')
     else:
@@ -158,10 +176,10 @@ def play_night():
     elif police_query:
         print('The person you queried is NOT an assassin.\n')
 
-    print('The police go to sleep.\n')
+    output('The police go to sleep.\n')
 
     # Mutilator
-    print('The mutilators wake up.')
+    output('The mutilators wake up.')
     if mutilator_turn:
         mutilated = input('Name of mutilatee: ')
         mutilated_area = input('Mutilated area (m/h): ')
@@ -169,10 +187,10 @@ def play_night():
         mutilated = None
         mutilated_area = None
 
-    print('The mutilators go to sleep.\n')
+    output('The mutilators go to sleep.\n')
 
     # Doctor
-    print('The doctors wake up.')
+    output('The doctors wake up.')
     if doctor_turn:
         patient = input('Name of patient: ')
     else:
@@ -184,27 +202,27 @@ def play_night():
     if patient and patient == assassinated:
         assassinated = None
 
-    print('The doctors go to sleep.\n')
+    output('The doctors go to sleep.\n')
 
     print('---------- NIGHT ' + str(cycle_count) + ' END ----------\n')
     print('---------- DAY ' + str(cycle_count + 1) + ' ----------\n')
 
-    print('Everyone wakes up.\n')
+    output('Everyone wakes up.\n')
     if game_over():
         return
 
     if assassinated:
-        print(assassinated + ' was assassinated.')
+        output(assassinated + ' was assassinated.')
         kill(assassinated)
     else:
-        print('Nobody was assassinated.')
+        output('Nobody was assassinated.')
 
     if mutilated and mutilated_area == 'm':
-        print(mutilated + ' had his mouth mutilated. He cannot speak today.')
+        output(mutilated + ' had his mouth mutilated. He cannot speak today.')
     elif mutilated:
-        print(mutilated + ' had his hand mutilated. He cannot vote today.')
+        output(mutilated + ' had his hand mutilated. He cannot vote today.')
     else:
-        print('Nobody was mutilated.')
+        output('Nobody was mutilated.')
 
     print('\n')
 
@@ -255,13 +273,13 @@ def print_results():
     # TODO: (Chris) print results
     print('---------- RESULTS ----------')
     if suicidal_won():
-        print("The suicidal person won!\n")
+        output("The suicidal person won!\n")
 
     if mafia_won():
-        print("The mafia won!\n")
+        output("The mafia won!\n")
 
     if town_won():
-        print("The town won!\n")
+        output("The town won!\n")
 
     print('\n')
     print_mafia()
@@ -284,6 +302,9 @@ def play_game():
 
 # Execution starts here
 parser = ArgumentParser()
+parser.add_argument('-x', '--textonly', action = 'store_true',
+                    help = 'Do not use voice commands')
+
 parser.add_argument('-d', '--debug', action = 'store_true',
                     help = 'All input comes from console')
 
@@ -293,6 +314,7 @@ parser.add_argument('-t', '--test', action = 'store_true',
 args = parser.parse_args()
 debug_mode = args.debug
 test_mode = args.test
+speak_mode = not args.textonly
 
 if assign_roles():
     sys.exit()

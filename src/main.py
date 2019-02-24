@@ -145,6 +145,11 @@ def play_day():
     print('\n---------- DAY ' + str(cycle_count) + ' END ----------\n')
 
 
+def valid_target(name):
+    # Checks if person is in the game and alive
+    return name in player_roles and player_alive[name]
+
+
 def play_night():
     # These symbolise if the respective turns can still act at night
     assn_turn = bool(alive_cnt[ASSN_IDX])
@@ -159,9 +164,11 @@ def play_night():
     # Assn
     output('The assassins wake up.')
     if assn_turn:
-        assassinated = input('Name of assassinee: ')
-        while player_roles[assassinated] == ASSN_IDX:
-            assassinated = input('You cannot kill fellow assassins. Name of assassinee: ')
+        assassinated = input('Person to assassinate: ')
+        while not valid_target(assassinated) or\
+              player_roles[assassinated] == ASSN_IDX:
+
+            assassinated = input('Invalid target. Person to assassinate: ')
     else:
         assassinated = None
         sleep_time = random.randint(6, 10)
@@ -173,6 +180,8 @@ def play_night():
     output('The police wake up.')
     if police_turn:
         police_query = input('Person to query: ')
+        while not valid_target(police_query):
+            police_query = input('Invalid target. Person to query: ')
     else:
         police_query = None
         sleep_time = random.randint(6, 10)
@@ -188,8 +197,14 @@ def play_night():
     # Mutilator
     output('The mutilators wake up.')
     if mutilator_turn:
-        mutilated = input('Name of mutilatee: ')
-        mutilated_area = input('Mutilated area (m/h): ')
+        mutilated = input('Person to mutilate: ')
+        while not valid_target(mutilated):
+            mutilated = input('Invalid target. Person to mutilate: ') 
+
+        mutilated_area = input('Area to mutilate (m/h): ')
+        while mutilated_area != 'm' and mutilated_area != 'h':
+            mutilated_area = input('Invalid area. Choose \'m\' for mouth or ' + \
+                                   '\'h\' for hand: ')
     else:
         mutilated = None
         mutilated_area = None
@@ -201,7 +216,9 @@ def play_night():
     # Doctor
     output('The doctors wake up.')
     if doctor_turn:
-        patient = input('Name of patient: ')
+        patient = input('Person to protect: ')
+        while not valid_target(patient):
+            patient = input('Invalid target. Person to protect: ')
     else:
         patient = None
         sleep_time = random.randint(6, 10)

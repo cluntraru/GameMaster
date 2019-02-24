@@ -1,10 +1,11 @@
 from tkinter import *
 
-COLORS=["red","green","blue","brown","orange","purple"]
+COLORS = ["red","green","blue","brown","orange","purple"]
 NOBODY = "NONE"
 
 assassinatedPerson = NOBODY
 checkedPerson = NOBODY
+savedPerson = NOBODY
 
 def createVotingScreen(player_window, player_names, vote_function): #populates all voting screens
 
@@ -73,7 +74,7 @@ def nightAssassinVote(town_names):
 
 def nightCopVote(player_names):
     currWindow = Tk()
-    currWindow.title("NIGHT PHASE: " +  "Assassins kill: ")
+    currWindow.title("NIGHT PHASE: " +  "Cop checks: ")
 
     def copVoteFunction(playerWindow, playerName):
         def callback():
@@ -88,6 +89,24 @@ def nightCopVote(player_names):
     global checkedPerson
     return checkedPerson
 
+def nightDoctorVote(player_names):
+    currWindow = Tk()
+    currWindow.title("NIGHT PHASE: " +  "Doctor saves: ")
+
+    def doctorVoteFunction(playerWindow, playerName):
+        def callback():
+            global savedPerson
+            savedPerson = playerName
+            playerWindow.destroy()
+
+        return callback
+
+    createVotingScreen(currWindow, player_names, doctorVoteFunction)
+
+    global savedPerson
+    return savedPerson
 
 
-nightCopVote(["Marcel","Ionela","Swagmaster","Bozgorel","Atcineva"])
+
+
+nightDoctorVote(["Marcel","Ionela","Trump","Putin","Atcineva"])

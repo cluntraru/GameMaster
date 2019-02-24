@@ -2,6 +2,7 @@ import random
 import math
 import sys
 import os
+import time
 from argparse import ArgumentParser
 
 PLAYER_IDX = 0
@@ -159,8 +160,12 @@ def play_night():
     output('The assassins wake up.')
     if assn_turn:
         assassinated = input('Name of assassinee: ')
+        while player_roles[assassinated] == ASSN_IDX:
+            assassinated = input('You cannot kill fellow assassins. Name of assassinee: ')
     else:
         assassinated = None
+        sleep_time = random.randint(6, 10)
+        time.sleep(sleep_time)
 
     output('The assassins go to sleep.\n')
 
@@ -170,6 +175,8 @@ def play_night():
         police_query = input('Person to query: ')
     else:
         police_query = None
+        sleep_time = random.randint(6, 10)
+        time.sleep(sleep_time)
     
     if police_query and player_roles[police_query] == ASSN_IDX:
         print('The person you queried is an assassin.\n')
@@ -186,6 +193,8 @@ def play_night():
     else:
         mutilated = None
         mutilated_area = None
+        sleep_time = random.randint(6, 10)
+        time.sleep(sleep_time)
 
     output('The mutilators go to sleep.\n')
 
@@ -195,6 +204,8 @@ def play_night():
         patient = input('Name of patient: ')
     else:
         patient = None
+        sleep_time = random.randint(6, 10)
+        time.sleep(sleep_time)
 
     if patient and patient == mutilated:
         mutilated = None

@@ -5,6 +5,7 @@ import math
 import sys
 import os
 import time
+import gm_email
 from argparse import ArgumentParser
 
 PLAYER_IDX = 0
@@ -29,7 +30,6 @@ def output(text):
     ''' Speaks and prints the input text if SPEAK_MODE is enabled. Prints
     otherwise
     '''
-
     if SPEAK_MODE:
         speak(text)
         print(text)
@@ -41,10 +41,9 @@ def speak(text):
     ''' Wrapper for platform specific text-to-speech functionality. Should be
     called similar to print().
     '''
-
     # TODO: (Chris) add text-to-speech for Windows and Linux
     if sys.platform == 'darwin':
-        os.system('say ' + text)
+        os.system('say ' + '"' + text + '"')
 
 
 def assign_roles():
@@ -54,8 +53,12 @@ def assign_roles():
 
     # TODO: (Lulu) UI for entering names
     roles_cnt[PLAYER_IDX] = int(input('Enter number of players: '))
-    if roles_cnt[PLAYER_IDX] < 5:
-        output('Unfortunately, you can\'t play with less than 5 people :(')
+    # if roles_cnt[PLAYER_IDX] < 5:
+        # output('Unfortunately, you cannot play with less than 5 people :(')
+        # return -1
+
+    if roles_cnt[PLAYER_IDX] > 20:
+        output('Unfortunately, you cannot play with more than 20 people :(')
         return -1
 
     roles_cnt[ASSN_IDX] = math.floor(1 + (roles_cnt[PLAYER_IDX] - 5) / 4)
@@ -90,14 +93,31 @@ def assign_roles():
 
     random.shuffle(role_list)
 
+    emails = []
+    msgs = []
     for i in range(roles_cnt[PLAYER_IDX]):
         curr_name = input('Enter player ' + str(i + 1) + ' name: ')
         while (curr_name == '' or curr_name in player_roles):
             curr_name = input('Please choose another name: ')
 
+        curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
+        sure = input('Are you sure (y for yes)?')
+        while sure != 'y':
+            curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
+            sure = input('Are you sure (y for yes)?')
+
         rand_index = random.randint(0, len(role_list) - 1)
         player_roles[curr_name] = role_list.pop(rand_index)
         player_alive[curr_name] = True
+
+        curr_msg = 'Hi ' + curr_name + '! Your role for this round is ' + \
+                   role_idx_to_name(player_roles[curr_name]) + '.'
+
+        emails.append(curr_email)
+        msgs.append(curr_msg)
+
+    for i in range(roles_cnt[PLAYER_IDX]):
+        gm_email.send_email(emails[i], msgs[i])
 
     print('\n')
     return 0
@@ -128,7 +148,7 @@ def role_idx_to_name(idx):
 
 def mafia_won():
     ''' True if mafia satisfies their win condition, False otherwise. '''
-    return alive_cnt[ASSN_IDX] > alive_cnt[PLAYER_IDX] - alive_cnt[ASSN_IDX]
+    return alive_cnt[ASSN_IDX] >= alive_cnt[PLAYER_IDX] - alive_cnt[ASSN_IDX]
 
 
 def town_won():

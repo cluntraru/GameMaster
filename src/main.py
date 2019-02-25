@@ -24,7 +24,6 @@ def assign_roles():
     of players and names.
     '''
 
-    # TODO: (Lulu) UI for entering names
     roles_cnt[ct.PLAYER_IDX] = int(input('Enter number of players: '))
     if roles_cnt[ct.PLAYER_IDX] < 5:
         logger.output('Unfortunately, you cannot play with less than 5 people :(')
@@ -146,7 +145,7 @@ def play_day(cycle_count):
     if logger.is_debug_mode():
         lynched_name = input('Name of lynched player: ')
     else:
-        lynched_name = ui.dayVote(still_alive)
+        lynched_name = ui.day_vote(still_alive)
 
     if lynched_name != 'NONE':
         while lynched_name not in player_roles or not player_alive[lynched_name]:
@@ -205,7 +204,7 @@ def assn_night(assn_turn):
 
             assassinated = input('Invalid target. Person to assassinate: ')
     elif assn_turn and not logger.is_debug_mode():
-        assassinated = ui.nightAssassinVote(get_assn_targets())
+        assassinated = ui.night_assassin_vote(get_assn_targets())
     else:
         assassinated = None
         sleep_time = random.randint(6, 10)
@@ -223,16 +222,22 @@ def police_night(police_turn):
         while not valid_target(police_query):
             police_query = input('Invalid target. Person to query: ')
     elif police_turn and not logger.is_debug_mode():
-        police_query = ui.nightCopVote(get_police_targets())
+        police_query = ui.night_cop_vote(get_police_targets())
     else:
         police_query = None
         sleep_time = random.randint(6, 10)
         time.sleep(sleep_time)
+    if logger.is_debug_mode():
+        if police_query and player_roles[police_query] == ct.ASSN_IDX:
+            logger.log_info('The person you queried is an assassin.\n')
+        elif police_query:
+            logger.log_info('The person you queried is NOT an assassin.\n')
+    elif not logger.is_debug_mode():
+        if police_query and player_roles[police_query] == ct.ASSN_IDX:
+            ui.show_info('The person you queried is an assassin.\n')
+        elif police_query:
+            ui.show_info('The person you queried is NOT an assassin.\n')
 
-    if police_query and player_roles[police_query] == ct.ASSN_IDX:
-        logger.log_info('The person you queried is an assassin.\n')
-    elif police_query:
-        logger.log_info('The person you queried is NOT an assassin.\n')
 
     logger.output('The police go to sleep.\n')
 
@@ -245,12 +250,12 @@ def mutilator_night(mutilator_turn):
         while not valid_target(mutilated):
             mutilated = input('Invalid target. Person to mutilate: ')
 
-        mutilated_area = input('Area to mutilate (m/h): ')
-        while mutilated_area not in ('m', 'h'):
+        mutilated_area = input('Area to mutilate (M/H): ')
+        while mutilated_area not in ('M', 'H'):
             mutilated_area = input('Invalid area. Choose \'m\' for mouth or ' + \
                                    '\'h\' for hand: ')
     elif mutilator_turn and not logger.is_debug_mode():
-        mutilated, mutilated_area = ui.nightMutilatorVote(get_mutilator_targets())
+        mutilated, mutilated_area = ui.night_mutilator_vote(get_mutilator_targets())
     else:
         mutilated = None
         mutilated_area = None
@@ -269,7 +274,7 @@ def doctor_night(doctor_turn):
         while not valid_target(patient):
             patient = input('Invalid target. Person to protect: ')
     elif doctor_turn and not logger.is_debug_mode():
-        patient = ui.nightDoctorVote(get_doctor_targets())
+        patient = ui.night_doctor_vote(get_doctor_targets())
     else:
         patient = None
         sleep_time = random.randint(6, 10)
@@ -315,7 +320,7 @@ def play_night(cycle_count):
     else:
         logger.output('Nobody was assassinated.')
 
-    if mutilated and mutilated_area == 'm':
+    if mutilated and mutilated_area == 'M':
         logger.output(mutilated + ' had his mouth mutilated. He cannot speak today.')
     elif mutilated:
         logger.output(mutilated + ' had his hand mutilated. He cannot vote today.')
@@ -376,4 +381,6 @@ logger.dbg_log_all_roles(player_roles)
 play_game()
 log_results()
 # TODO: (Chris) make window hang after game
-# TODO: (Chris) implement hand mutilation logic (day voting) 
+# TODO: (Chris) implement hand mutilation logic (day voting)
+# TODO: (Chris) Switch to the email UI
+# TODO: (Chris) Make the breaks between roles during the night bigger so people have time(for real games)

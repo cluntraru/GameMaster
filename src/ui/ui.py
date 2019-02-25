@@ -137,4 +137,4 @@ def nightMutilatorVote(player_names):
     global mutilaredPerson, mutilatedPlace
     return (mutilatedPerson,mutilatedPlace)
 
-nightMutilatorVote(["Marcel","Ionela","Trump","Putin","Atcineva"])
+# nightMutilatorVote(["Marcel","Ionela","Trump","Putin","Atcineva"])

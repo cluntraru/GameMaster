@@ -1,140 +1,205 @@
-from tkinter import *
+'''Ui of mafia storyteller'''
 
-COLORS = ["red","green","blue","brown","orange","purple"]
+from tkinter import Frame, Tk, Button, Text, LEFT, BOTTOM, INSERT, Label, Entry
+from math import floor
+
+COLORS = ["red", "green", "blue", "brown", "orange", "purple"]
 NOBODY = "NONE"
+MAX_ENTRIES = 10
+LEFT_SHIFT = 300
 
-assassinatedPerson = NOBODY
-checkedPerson = NOBODY
-savedPerson = NOBODY
-mutilatedPerson = NOBODY
-mutilatedPlace = NOBODY
+assassinated_person = NOBODY
+checked_person = NOBODY
+saved_person = NOBODY
+mutilated_person = NOBODY
+mutilation_place = NOBODY
 
-def createVotingScreen(player_window, player_names, vote_function): #populates all voting screens
 
+def get_emails_form(player_names):
+    '''creates and shows email form'''
+    curr_window = Tk()
+    curr_window.geometry('500x500')
+    curr_window.title("Email Form")
+    label_0 = Label(curr_window, text="Email Form", width=20, font=("bold", 20))
+    label_0.place(x=90, y=53)
+    entries = []
+    labels = []
+    emails = []
+    for i in range(0, len(player_names)):
+        labels.append(Label(curr_window, text=player_names[i], width=20, font=("bold", 10)))
+        labels[i].place(x=80+LEFT_SHIFT*floor(i/MAX_ENTRIES), y=130+30*(i%MAX_ENTRIES))
+        entries.append(Entry(curr_window))
+        entries[i].place(x=240+LEFT_SHIFT*floor(i/MAX_ENTRIES), y=130+30*(i % MAX_ENTRIES))
+        emails.append(("", ""))
+
+    def get_vals():
+        '''gets emails from fields'''
+        for i in range(0, len(player_names)):
+            emails[i] = (player_names[i], entries[i].get())
+        curr_window.destroy()
+
+    done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
+    done_button.place(x=80+LEFT_SHIFT*floor(len(player_names)/MAX_ENTRIES), y=130+30*(MAX_ENTRIES+1))
+    curr_window.mainloop()
+    return emails
+
+
+def show_info(curr_info):
+    '''shows info, mostly for cop'''
+    curr_window = Tk()
+    curr_window.title("Night Report For Cop")
+    def destroy_window():
+        '''destroys window'''
+        curr_window.destroy()
+
+    screen_info = Text(curr_window)
+    screen_info.insert(INSERT, curr_info)
+    screen_info.pack()
+    done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=destroy_window)
+    done_button.pack()
+    curr_window.mainloop()
+
+def create_voting_screen(player_window, player_names, vote_function): #populates all voting screens
+    '''screen populating function'''
     top_frame = Frame(player_window)
     top_frame.pack()
 
     bottom_frame = Frame(player_window)
     bottom_frame.pack()
 
-    numberOfPlayers = len(player_names)
-    for i in range(0, numberOfPlayers):
-        playerName = player_names[i]
-        if (i < numberOfPlayers / 2):
-            currFrame = top_frame
+    number_of_players = len(player_names)
+    for i in range(0, number_of_players):
+        player_name = player_names[i]
+        if i < number_of_players / 2:
+            curr_frame = top_frame
         else:
-            currFrame = bottom_frame
-        b = Button(currFrame, fg=COLORS[i % len(COLORS)], height=20, width=17,
-                   text=playerName, command=vote_function(player_window, playerName))
-        b.pack(side=LEFT)
+            curr_frame = bottom_frame
+        done_button = Button(curr_frame, fg=COLORS[i % len(COLORS)], height=20, width=17, text=player_name, command=vote_function(player_window, player_name))
+        done_button.pack(side=LEFT)
 
     player_window.mainloop()  # make sure buttons are constantly displayed
 
-def dayVote(player_names):
-    playerVotes = {}
-    for playerName in player_names:
-        playerVotes[playerName] = 0
-    playerVotes[NOBODY] = 0
-    for playerName in player_names:
+def day_vote(player_names):
+    '''day vote'''
+    player_votes = {}
+    for player_name in player_names:
+        player_votes[player_name] = 0
+    player_votes[NOBODY] = 0
+    for player_name in player_names:
 
-        currWindow = Tk()
-        currPlayer = playerName
-        currWindow.title("DAY PHASE: " + currPlayer + " votes ")
+        curr_window = Tk()
+        curr_player = player_name
+        curr_window.title("DAY PHASE: " + curr_player + " votes ")
 
-        def dayVoteFunction(playerWindow,playerName):
+        def day_vote_function(player_window, player_name):
             def callback():
-                playerVotes[playerName] += 1
-                playerWindow.destroy()
+                player_votes[player_name] += 1
+                player_window.destroy()
             return callback
 
-        createVotingScreen(currWindow, player_names, dayVoteFunction)
+        create_voting_screen(curr_window, player_names, day_vote_function)
 
 
-    hangedPlayer = NOBODY
-    for playerName in player_names:
-        if (playerVotes[playerName] > len(player_names)/2):
-            hangedPlayer = playerName
-    print("The victim was: " + hangedPlayer)
-    return hangedPlayer
+    hanged_player = NOBODY
+    for player_name in player_names:
+        if player_votes[player_name] > len(player_names) / 2:
+            hanged_player = player_name
+    print("The victim was: " + hanged_player)
+    return hanged_player
 
-def nightAssassinVote(town_names):
-    currWindow = Tk()
-    currWindow.title("NIGHT PHASE: " +  "Assassins kill: ")
+def night_assassin_vote(town_names):
+    '''assassin vote'''
+    curr_window = Tk()
+    curr_window.title("NIGHT PHASE: " +  "Assassins kill: ")
 
-    def assassinVoteFunction(playerWindow, playerName):
+    def assassin_vote_function(player_window, player_name):
+        '''assassin vote'''
         def callback():
-            global assassinatedPerson
-            assassinatedPerson = playerName
-            playerWindow.destroy()
+            '''callback'''
+            global assassinated_person
+            assassinated_person = player_name
+            player_window.destroy()
 
         return callback
 
-    createVotingScreen(currWindow, town_names, assassinVoteFunction)
+    create_voting_screen(curr_window, town_names, assassin_vote_function)
 
-    global assassinatedPerson
-    return assassinatedPerson
+    global assassinated_person
+    return assassinated_person
 
-def nightCopVote(player_names):
-    currWindow = Tk()
-    currWindow.title("NIGHT PHASE: " +  "Cop checks: ")
+def night_cop_vote(player_names):
+    '''cop vote'''
+    curr_window = Tk()
+    curr_window.title("NIGHT PHASE: " +  "Cop checks: ")
 
-    def copVoteFunction(playerWindow, playerName):
+    def cop_vote_function(player_window, player_name):
+        '''cop vote'''
         def callback():
-            global checkedPerson
-            checkedPerson = playerName
-            playerWindow.destroy()
+            '''callback'''
+            global checked_person
+            checked_person = player_name
+            player_window.destroy()
 
         return callback
 
-    createVotingScreen(currWindow, player_names, copVoteFunction)
+    create_voting_screen(curr_window, player_names, cop_vote_function)
 
-    global checkedPerson
-    return checkedPerson
+    global checked_person
+    return checked_person
 
-def nightDoctorVote(player_names):
-    currWindow = Tk()
-    currWindow.title("NIGHT PHASE: " +  "Doctor saves: ")
+def night_doctor_vote(player_names):
+    '''doctor vote'''
+    curr_window = Tk()
+    curr_window.title("NIGHT PHASE: " +  "Doctor saves: ")
 
-    def doctorVoteFunction(playerWindow, playerName):
+    def doctor_vote_function(player_window, player_name):
+        '''doctor vote'''
         def callback():
-            global savedPerson
-            savedPerson = playerName
-            playerWindow.destroy()
+            '''callback'''
+            global saved_person
+            saved_person = player_name
+            player_window.destroy()
 
         return callback
 
-    createVotingScreen(currWindow, player_names, doctorVoteFunction)
+    create_voting_screen(curr_window, player_names, doctor_vote_function)
 
-    global savedPerson
-    return savedPerson
+    global saved_person
+    return saved_person
 
-def nightMutilatorVote(player_names):
-
-    def mutilatorVoteFunction(playerWindow, playerName):
+def night_mutilator_vote(player_names):
+    '''mutilator vote'''
+    def mutilator_vote_function(player_window, player_name):
+        '''mutilator vote'''
         def callback():
-            global mutilatedPerson
-            mutilatedPerson = playerName
-            playerWindow.destroy()
+            '''callback'''
+            global mutilated_person
+            mutilated_person = player_name
+            player_window.destroy()
 
         return callback
 
-    def mutilatorPlaceFunction(playerWindow, placeName):
+    def mutilator_place_function(player_window, place_name):
         def callback():
-            global mutilatedPlace
-            mutilatedPlace = placeName[0]
-            playerWindow.destroy()
+            global mutilation_place
+            mutilation_place = place_name[0]
+            player_window.destroy()
 
         return callback
 
-    currWindow = Tk()
-    currWindow.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-    createVotingScreen(currWindow, player_names, mutilatorVoteFunction)
+    curr_window = Tk()
+    curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
+    create_voting_screen(curr_window, player_names, mutilator_vote_function)
 
-    currWindow = Tk()
-    currWindow.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-    createVotingScreen(currWindow, ["Hand", "Mouth"], mutilatorPlaceFunction)
+    curr_window = Tk()
+    curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
+    create_voting_screen(curr_window, ["Hand", "Mouth"], mutilator_place_function)
 
-    global mutilaredPerson, mutilatedPlace
-    return (mutilatedPerson,mutilatedPlace)
+    global mutilared_person, mutilation_place
+    return (mutilated_person, mutilation_place)
 
-# nightMutilatorVote(["Marcel","Ionela","Trump","Putin","Atcineva"])
+#lista = ["Marcel", "Ionela", "Trump", "Putin", "Atcineva"]
+#lista.extend(lista)
+#lista.append("DA")
+#get_emails_form(lista)
+#show_info("hello")

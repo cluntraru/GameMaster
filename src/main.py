@@ -94,7 +94,6 @@ def assign_roles():
 
     logger.log_info('\n')
     return 0
-    # TODO: (Lulu) Make a UI so that everyone can find out their roles kthxbye
 
 
 def kill(player_name):
@@ -141,7 +140,6 @@ def get_alive_players():
 def play_day(cycle_count):
     ''' Simulates the next daytime phase in the game. '''
 
-    # TODO: (Lulu) Make a UI for Lynching (lynched_name is name of victim)
     still_alive = get_alive_players()
     logger.log_info('Still alive: '  + str(still_alive))
 
@@ -290,7 +288,6 @@ def play_night(cycle_count):
     doctor_turn = bool(alive_cnt[ct.DOCTOR_IDX])
     mutilator_turn = bool(alive_cnt[ct.MTLT_IDX])
 
-    # TODO: (Lulu) UI for every night action
     logger.log_info('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
     logger.output('Everyone goes to sleep.\n')
 
@@ -378,3 +375,5 @@ logger.dbg_log_all_roles(player_roles)
 
 play_game()
 log_results()
+# TODO: (Chris) make window hang after game
+# TODO: (Chris) implement hand mutilation logic (day voting) 

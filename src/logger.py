@@ -1,7 +1,11 @@
 ''' This deals with all the output '''
 import sys
-import win32com.client
 import constants as ct
+import os
+try:
+    import win32com.client
+except ImportError:
+    pass
 
 DEBUG_MODE = None
 SPEAK_MODE = None

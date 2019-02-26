@@ -380,7 +380,6 @@ logger.dbg_log_all_roles(player_roles)
 
 play_game()
 log_results()
-# TODO: (Chris) make window hang after game
 # TODO: (Chris) implement hand mutilation logic (day voting)
 # TODO: (Chris) Switch to the email UI
 # TODO: (Chris) Make the breaks between roles during the night bigger so people have time(for real games)

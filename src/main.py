@@ -136,10 +136,16 @@ def get_alive_players():
     return targets
 
 
+def get_voting_players():
+    targets = []
+    for name in player_roles:
+        if player_alive[name] and 
+
+
 def play_day(cycle_count):
     ''' Simulates the next daytime phase in the game. '''
 
-    still_alive = get_alive_players()
+    can_vote = get_alive_players()
     logger.log_info('Still alive: '  + str(still_alive))
 
     if logger.is_debug_mode():
@@ -252,8 +258,8 @@ def mutilator_night(mutilator_turn):
 
         mutilated_area = input('Area to mutilate (M/H): ')
         while mutilated_area not in ('M', 'H'):
-            mutilated_area = input('Invalid area. Choose \'m\' for mouth or ' + \
-                                   '\'h\' for hand: ')
+            mutilated_area = input('Invalid area. Choose \'M\' for mouth or ' + \
+                                   '\'H\' for hand: ')
     elif mutilator_turn and not logger.is_debug_mode():
         mutilated, mutilated_area = ui.night_mutilator_vote(get_mutilator_targets())
     else:
@@ -380,6 +386,3 @@ logger.dbg_log_all_roles(player_roles)
 
 play_game()
 log_results()
-# TODO: (Chris) implement hand mutilation logic (day voting)
-# TODO: (Chris) Switch to the email UI
-# TODO: (Chris) Make the breaks between roles during the night bigger so people have time(for real games)

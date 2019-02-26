@@ -7,7 +7,5 @@ def send_email(to_email, message):
     game_master_passwd = '^34Qnmjgl!leIIkV7UdSxabx$&6pFG&Y'
     server.login(game_master_email, game_master_passwd)
      
-    print(to_email)
-    print(message)
     server.sendmail(game_master_email, to_email, message)
     server.quit()

@@ -1,21 +1,46 @@
 '''Ui of mafia storyteller'''
-
 from tkinter import Frame, Tk, Button, Text, LEFT, BOTTOM, INSERT, Label, Entry
 from math import floor
+import io_api.logger as logger
 
 COLORS = ["red", "green", "blue", "brown", "orange", "purple"]
 NOBODY = "NONE"
 MAX_ENTRIES = 10
-LEFT_SHIFT = 300
+LEFT_SHIFT = 160
+UP_SHIFT = 40
 
 assassinated_person = NOBODY
 checked_person = NOBODY
 saved_person = NOBODY
 mutilated_person = NOBODY
 mutilation_place = NOBODY
+field_number = "-1"
+
+def get_players_number():
+    '''gets players number'''
+    curr_window = Tk()
+    curr_window.geometry('500x500')
+    curr_window.title("Players number")
+
+    text_label = Label(curr_window, text="Insert number of players:", width=20, font=("bold",10))
+    text_label.place(x = 10, y = UP_SHIFT)
+    number_entry = Entry(curr_window)
+    number_entry.place(x = 20, y = UP_SHIFT * 2)
+    def get_val():
+        '''gets number from field'''
+        global field_number
+        field_number = number_entry.get()
+        curr_window.destroy()
+    done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_val)
+    done_button.place(x = 20, y = UP_SHIFT * 3)
+    curr_window.mainloop()
+    if (int(field_number)) == -1:
+        logger.log_debug("Window for getting players number closed\n")
+
+    return int(field_number)
 
 
-def get_emails_form(player_names):
+def get_emails_form(players_number):
     '''creates and shows email form'''
     curr_window = Tk()
     curr_window.geometry('500x500')
@@ -24,24 +49,31 @@ def get_emails_form(player_names):
     label_0.place(x=90, y=53)
     entries = []
     labels = []
-    emails = []
-    for i in range(0, len(player_names)):
-        labels.append(Label(curr_window, text=player_names[i], width=20, font=("bold", 10)))
-        labels[i].place(x=80+LEFT_SHIFT*floor(i/MAX_ENTRIES), y=130+30*(i%MAX_ENTRIES))
+
+    emails_and_names = []
+    for i in range(0, players_number):
+        labels.append(Label(curr_window, text="Player " + str(i + 1) + " name:", width=20, font=("bold", 10)))
+        labels[i*2].place(x=LEFT_SHIFT*4*floor(i/MAX_ENTRIES), y=130+30*(i%MAX_ENTRIES))
         entries.append(Entry(curr_window))
-        entries[i].place(x=240+LEFT_SHIFT*floor(i/MAX_ENTRIES), y=130+30*(i % MAX_ENTRIES))
-        emails.append(("", ""))
+        entries[i*2].place(x=LEFT_SHIFT*(4*(floor(i/MAX_ENTRIES))+1), y=130+30*(i % MAX_ENTRIES))
+
+        labels.append(Label(curr_window, text="Player " + str(i + 1) + " email:", width=20, font=("bold", 10)))
+        labels[i * 2 + 1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 2), y=130 + 30 * (i % MAX_ENTRIES))
+        entries.append(Entry(curr_window))
+        entries[i * 2 +1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 3), y=130 + 30 * (i % MAX_ENTRIES))
 
     def get_vals():
         '''gets emails from fields'''
-        for i in range(0, len(player_names)):
-            emails[i] = (player_names[i], entries[i].get())
+        for i in range(0, players_number):
+            emails_and_names.append((entries[i*2].get(), entries[i * 2 + 1].get()))
         curr_window.destroy()
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
-    done_button.place(x=80+LEFT_SHIFT*floor(len(player_names)/MAX_ENTRIES), y=130+30*(MAX_ENTRIES+1))
+    done_button.place(x=80+LEFT_SHIFT*floor(players_number/MAX_ENTRIES), y=130+30*(MAX_ENTRIES+1))
     curr_window.mainloop()
-    return emails
+    if(len(emails_and_names) == 0):
+        logger.log_debug("Window for emails and names was closed\n")
+    return emails_and_names
 
 
 def show_info(curr_info):
@@ -58,6 +90,7 @@ def show_info(curr_info):
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=destroy_window)
     done_button.pack()
     curr_window.mainloop()
+
 
 def create_voting_screen(player_window, player_names, vote_function): #populates all voting screens
     '''screen populating function'''
@@ -79,14 +112,14 @@ def create_voting_screen(player_window, player_names, vote_function): #populates
 
     player_window.mainloop()  # make sure buttons are constantly displayed
 
-def day_vote(player_names):
+
+def day_vote(players_can_vote, votable_players):
     '''day vote'''
     player_votes = {}
-    for player_name in player_names:
+    for player_name in votable_players:
         player_votes[player_name] = 0
     player_votes[NOBODY] = 0
-    for player_name in player_names:
-
+    for player_name in players_can_vote:
         curr_window = Tk()
         curr_player = player_name
         curr_window.title("DAY PHASE: " + curr_player + " votes ")
@@ -97,15 +130,15 @@ def day_vote(player_names):
                 player_window.destroy()
             return callback
 
-        create_voting_screen(curr_window, player_names, day_vote_function)
-
+        create_voting_screen(curr_window, votable_players, day_vote_function)
 
     hanged_player = NOBODY
-    for player_name in player_names:
-        if player_votes[player_name] > len(player_names) / 2:
+    for player_name in votable_players:
+        if player_votes[player_name] > len(votable_players) / 2:
             hanged_player = player_name
     print("The victim was: " + hanged_player)
     return hanged_player
+
 
 def night_assassin_vote(town_names):
     '''assassin vote'''
@@ -127,6 +160,7 @@ def night_assassin_vote(town_names):
     global assassinated_person
     return assassinated_person
 
+
 def night_cop_vote(player_names):
     '''cop vote'''
     curr_window = Tk()
@@ -147,6 +181,7 @@ def night_cop_vote(player_names):
     global checked_person
     return checked_person
 
+
 def night_doctor_vote(player_names):
     '''doctor vote'''
     curr_window = Tk()
@@ -166,6 +201,7 @@ def night_doctor_vote(player_names):
 
     global saved_person
     return saved_person
+
 
 def night_mutilator_vote(player_names):
     '''mutilator vote'''
@@ -201,5 +237,6 @@ def night_mutilator_vote(player_names):
 #lista = ["Marcel", "Ionela", "Trump", "Putin", "Atcineva"]
 #lista.extend(lista)
 #lista.append("DA")
-#get_emails_form(lista)
+# players_number=get_players_number()
+# print(get_emails_form(5))
 #show_info("hello")

@@ -14,3 +14,7 @@ This is where you put resources that need to be used by the app.
 ### aux
 
 This is where references and extra information go.
+
+## Useful Links
+
+[YouTrack](http://gamemaster.myjetbrains.com/)

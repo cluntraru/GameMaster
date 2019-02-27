@@ -3,92 +3,72 @@
 import random
 import math
 import sys
-import os
 import time
-import gm_email
-import ui.ui as ui
-import logger
-import constants as ct
 from argparse import ArgumentParser
+
+import email_api.gm_email as gm_email
+import io_api.facade_io as io
+import io_api.logger as logger
+import player_api.player as pl
 
 suicidal_lynched = False
 
-roles_cnt = [0, 0, 0, 0, 0, 0, 0]
 alive_cnt = []
 
-player_roles = {}
-player_alive = {}
+player_data = {}
 
 def assign_roles():
     ''' Randomly generates roles for each of the players. Also asks for number
-    of players and names.
-    '''
+    of players and names. '''
+    roles_cnt = [0, 0, 0, 0, 0, 0, 0]
+    roles_cnt[pl.Player.PLAYER_IDX] = io.get_player_cnt()
 
-    roles_cnt[ct.PLAYER_IDX] = int(input('Enter number of players: '))
-    if roles_cnt[ct.PLAYER_IDX] < 5:
+    if roles_cnt[pl.Player.PLAYER_IDX] < 5:
         logger.output('Unfortunately, you cannot play with less than 5 people :(')
         return -1
 
-    if roles_cnt[ct.PLAYER_IDX] > 20:
+    if roles_cnt[pl.Player.PLAYER_IDX] > 20:
         logger.output('Unfortunately, you cannot play with more than 20 people :(')
         return -1
 
-    roles_cnt[ct.ASSN_IDX] = math.floor(1 + (roles_cnt[ct.PLAYER_IDX] - 5) / 4)
-    roles_cnt[ct.POLICE_IDX] = math.floor(1 + (roles_cnt[ct.PLAYER_IDX] - 5) / 5)
-    roles_cnt[ct.SUICD_IDX] = 1
-    roles_cnt[ct.DOCTOR_IDX] = 1 + (roles_cnt[ct.PLAYER_IDX] >= 10)
-    roles_cnt[ct.MTLT_IDX] = 1 + (roles_cnt[ct.PLAYER_IDX] >= 10)
-    roles_cnt[ct.POTATO_IDX] = roles_cnt[ct.PLAYER_IDX] - roles_cnt[ct.ASSN_IDX] - \
-                            roles_cnt[ct.POLICE_IDX] - roles_cnt[ct.SUICD_IDX] - \
-                            roles_cnt[ct.DOCTOR_IDX] - roles_cnt[ct.MTLT_IDX]
+    roles_cnt[pl.Player.ASSN_IDX] = math.floor(1 + (roles_cnt[pl.Player.PLAYER_IDX] - 5) / 4)
+    roles_cnt[pl.Player.POLICE_IDX] = math.floor(1 + (roles_cnt[pl.Player.PLAYER_IDX] - 5) / 5)
+    roles_cnt[pl.Player.SUICD_IDX] = 1
+    roles_cnt[pl.Player.DOCTOR_IDX] = 1 + (roles_cnt[pl.Player.PLAYER_IDX] >= 10)
+    roles_cnt[pl.Player.MTLT_IDX] = 1 + (roles_cnt[pl.Player.PLAYER_IDX] >= 10)
+    roles_cnt[pl.Player.POTATO_IDX] = roles_cnt[pl.Player.PLAYER_IDX] -\
+                                      roles_cnt[pl.Player.ASSN_IDX] -\
+                                      roles_cnt[pl.Player.POLICE_IDX] -\
+                                      roles_cnt[pl.Player.SUICD_IDX] -\
+                                      roles_cnt[pl.Player.DOCTOR_IDX] -\
+                                      roles_cnt[pl.Player.MTLT_IDX]
 
     global alive_cnt
     alive_cnt = roles_cnt
 
     role_list = []
-    for i in range(roles_cnt[ct.ASSN_IDX]):
-        role_list.append(ct.ASSN_IDX)
+    for i in range(roles_cnt[pl.Player.ASSN_IDX]):
+        role_list.append(pl.Player.ASSN_IDX)
 
-    for i in range(roles_cnt[ct.POLICE_IDX]):
-        role_list.append(ct.POLICE_IDX)
+    for i in range(roles_cnt[pl.Player.POLICE_IDX]):
+        role_list.append(pl.Player.POLICE_IDX)
 
-    role_list.append(ct.SUICD_IDX)
+    role_list.append(pl.Player.SUICD_IDX)
 
-    for i in range(roles_cnt[ct.DOCTOR_IDX]):
-        role_list.append(ct.DOCTOR_IDX)
+    for i in range(roles_cnt[pl.Player.DOCTOR_IDX]):
+        role_list.append(pl.Player.DOCTOR_IDX)
 
-    for i in range(roles_cnt[ct.MTLT_IDX]):
-        role_list.append(ct.MTLT_IDX)
+    for i in range(roles_cnt[pl.Player.MTLT_IDX]):
+        role_list.append(pl.Player.MTLT_IDX)
 
-    for i in range(roles_cnt[ct.POTATO_IDX]):
-        role_list.append(ct.POTATO_IDX)
+    for i in range(roles_cnt[pl.Player.POTATO_IDX]):
+        role_list.append(pl.Player.POTATO_IDX)
 
     random.shuffle(role_list)
 
-    emails = []
-    msgs = []
-    for i in range(roles_cnt[ct.PLAYER_IDX]):
-        curr_name = input('Enter player ' + str(i + 1) + ' name: ')
-        while (curr_name == '' or curr_name in player_roles):
-            curr_name = input('Please choose another name: ')
+    emails, msgs = io.get_names_emails(role_list, roles_cnt[pl.Player.PLAYER_IDX], player_data)
 
-        curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
-        # sure = input('Are you sure (y for yes)?')
-        # while sure != 'y':
-        #     curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
-        #     sure = input('Are you sure (y for yes)?')
-
-        rand_index = random.randint(0, len(role_list) - 1)
-        player_roles[curr_name] = role_list.pop(rand_index)
-        player_alive[curr_name] = True
-
-        curr_msg = 'Hi ' + curr_name + '! Your role for this round is ' + \
-                   logger.role_idx_to_name(player_roles[curr_name]) + '.'
-
-        emails.append(curr_email)
-        msgs.append(curr_msg)
-
-    for i in range(roles_cnt[ct.PLAYER_IDX]):
+    for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
         gm_email.send_email(emails[i], msgs[i])
 
     logger.log_info('\n')
@@ -98,77 +78,87 @@ def assign_roles():
 def kill(player_name):
     ''' Removes a player from the game, updating all the necessary structures.
     '''
-    player_alive[player_name] = False
-    alive_cnt[player_roles[player_name]] -= 1
-    alive_cnt[ct.PLAYER_IDX] -= 1
+    player_data[player_name].die()
+    alive_cnt[player_data[player_name].get_role_idx()] -= 1
+    alive_cnt[pl.Player.PLAYER_IDX] -= 1
 
 
 def mafia_won():
     ''' True if mafia satisfies their win condition, False otherwise. '''
-    return alive_cnt[ct.ASSN_IDX] >= alive_cnt[ct.PLAYER_IDX] - alive_cnt[ct.ASSN_IDX]
+    return alive_cnt[pl.Player.ASSN_IDX] >= alive_cnt[pl.Player.PLAYER_IDX] -\
+           alive_cnt[pl.Player.ASSN_IDX]
 
 
 def town_won():
     ''' True if town satisfies their win condition, False otherwise. '''
-    return alive_cnt[ct.ASSN_IDX] == 0
+    return alive_cnt[pl.Player.ASSN_IDX] == 0
 
 
 def suicidal_won():
     ''' True if the suicidal person satisfies their win condition, False
-    otherwise.
-    '''
+    otherwise. '''
     return suicidal_lynched
 
 
 def game_over():
-    ''' True if any of the factions satisfy their win condition.
-    '''
+    ''' True if any of the factions satisfy their win condition. '''
     return town_won() or mafia_won() or suicidal_won()
 
 
 def get_alive_players():
     ''' Returns a list of all players that are still alive. '''
     targets = []
-    for name in player_roles:
-        if player_alive[name]:
+    for name in player_data:
+        if player_data[name].get_alive():
             targets.append(name)
 
     return targets
 
 
+def get_voting_players():
+    ''' Returns a list of players that are able to vote. '''
+    targets = []
+    for name in player_data:
+        if player_data[name].get_alive() and player_data[name].get_can_vote():
+            targets.append(name)
+
+    return targets
+
+
+def restore_voting_rights():
+    ''' Restore voting rights to all players. '''
+    for name in player_data:
+        player_data[name].set_can_vote(True)
+
+
 def play_day(cycle_count):
     ''' Simulates the next daytime phase in the game. '''
-
     still_alive = get_alive_players()
+    can_vote = get_voting_players()
+
     logger.log_info('Still alive: '  + str(still_alive))
 
-    if logger.is_debug_mode():
-        lynched_name = input('Name of lynched player: ')
-    else:
-        lynched_name = ui.day_vote(still_alive)
+    lynched_name = io.get_lynched_name(can_vote, still_alive)
 
     if lynched_name != 'NONE':
-        while lynched_name not in player_roles or not player_alive[lynched_name]:
+        while lynched_name not in player_data or not player_data[lynched_name].get_alive():
             lynched_name = input('Not a valid player.\nName of lynched player: ')
 
-        if player_roles[lynched_name] == ct.SUICD_IDX:
+        if player_data[lynched_name].get_role_idx() == pl.Player.SUICD_IDX:
             global suicidal_lynched
             suicidal_lynched = True
 
         kill(lynched_name)
 
+    restore_voting_rights()
     logger.log_info('\n---------- DAY ' + str(cycle_count) + ' END ----------\n')
 
 
-def valid_target(player_name):
-    ''' Checks if a player is in the game and alive. '''
-    return player_name in player_roles and player_alive[player_name]
-
-
 def get_alive_players_minus_role(role_idx):
+    ''' Get all live players except those that have a certain role. '''
     targets = []
-    for name in player_roles:
-        if player_alive[name] and player_roles[name] != role_idx:
+    for name in player_data:
+        if player_data[name].get_alive() and player_data[name].get_role_idx() != role_idx:
             targets.append(name)
 
     return targets
@@ -176,7 +166,7 @@ def get_alive_players_minus_role(role_idx):
 
 def get_assn_targets():
     ''' Returns a list of the names of valid assassination targets. '''
-    return get_alive_players_minus_role(ct.ASSN_IDX)
+    return get_alive_players_minus_role(pl.Player.ASSN_IDX)
 
 
 def get_doctor_targets():
@@ -191,24 +181,25 @@ def get_mutilator_targets():
 
 def get_police_targets():
     ''' Returns a list of the names of valid police targets. '''
-    return get_alive_players_minus_role(ct.POLICE_IDX)
+    return get_alive_players_minus_role(pl.Player.POLICE_IDX)
+
+
+def fake_night_action():
+    ''' Waits for some time to fake that someone acted if said role
+    no longer exists in game. '''
+    if not logger.is_debug_mode():
+        sleep_time = random.randint(6, 10)
+        time.sleep(sleep_time)
 
 
 def assn_night(assn_turn):
     ''' Simulates the assassins' night phase '''
     logger.output('The assassins wake up.')
-    if assn_turn and logger.is_debug_mode():
-        assassinated = input('Person to assassinate: ')
-        while not valid_target(assassinated) or\
-              player_roles[assassinated] == ct.ASSN_IDX:
-
-            assassinated = input('Invalid target. Person to assassinate: ')
-    elif assn_turn and not logger.is_debug_mode():
-        assassinated = ui.night_assassin_vote(get_assn_targets())
+    if assn_turn:
+        assassinated = io.get_assn_target(player_data, get_assn_targets())
     else:
         assassinated = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     logger.output('The assassins go to sleep.\n')
     return assassinated
@@ -217,27 +208,14 @@ def assn_night(assn_turn):
 def police_night(police_turn):
     ''' Simulates the police's night phase '''
     logger.output('The police wake up.')
-    if police_turn and logger.is_debug_mode():
-        police_query = input('Person to query: ')
-        while not valid_target(police_query):
-            police_query = input('Invalid target. Person to query: ')
-    elif police_turn and not logger.is_debug_mode():
-        police_query = ui.night_cop_vote(get_police_targets())
+    if police_turn:
+        police_query = io.get_police_target(player_data, get_police_targets())
     else:
         police_query = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
-    if logger.is_debug_mode():
-        if police_query and player_roles[police_query] == ct.ASSN_IDX:
-            logger.log_info('The person you queried is an assassin.\n')
-        elif police_query:
-            logger.log_info('The person you queried is NOT an assassin.\n')
-    elif not logger.is_debug_mode():
-        if police_query and player_roles[police_query] == ct.ASSN_IDX:
-            ui.show_info('The person you queried is an assassin.\n')
-        elif police_query:
-            ui.show_info('The person you queried is NOT an assassin.\n')
+        fake_night_action()
 
+    if police_query:
+        io.show_police_answer(player_data, police_query)
 
     logger.output('The police go to sleep.\n')
 
@@ -245,22 +223,12 @@ def police_night(police_turn):
 def mutilator_night(mutilator_turn):
     '''' Simulates the mutilators' night phase. '''
     logger.output('The mutilators wake up.')
-    if mutilator_turn and logger.is_debug_mode():
-        mutilated = input('Person to mutilate: ')
-        while not valid_target(mutilated):
-            mutilated = input('Invalid target. Person to mutilate: ')
-
-        mutilated_area = input('Area to mutilate (M/H): ')
-        while mutilated_area not in ('M', 'H'):
-            mutilated_area = input('Invalid area. Choose \'m\' for mouth or ' + \
-                                   '\'h\' for hand: ')
-    elif mutilator_turn and not logger.is_debug_mode():
-        mutilated, mutilated_area = ui.night_mutilator_vote(get_mutilator_targets())
+    if mutilator_turn:
+        mutilated, mutilated_area = io.get_mutilator_target(player_data, get_mutilator_targets())
     else:
         mutilated = None
         mutilated_area = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     logger.output('The mutilators go to sleep.\n')
     return mutilated, mutilated_area
@@ -269,40 +237,52 @@ def mutilator_night(mutilator_turn):
 def doctor_night(doctor_turn):
     ''' Simulates the doctors' night phase. '''
     logger.output('The doctors wake up.')
-    if doctor_turn and logger.is_debug_mode():
-        patient = input('Person to protect: ')
-        while not valid_target(patient):
-            patient = input('Invalid target. Person to protect: ')
-    elif doctor_turn and not logger.is_debug_mode():
-        patient = ui.night_doctor_vote(get_doctor_targets())
+    if doctor_turn:
+        patient = io.get_doctor_target(player_data, get_doctor_targets())
     else:
         patient = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     logger.output('The doctors go to sleep.\n')
     return patient
+
+
+def pause_between_roles():
+    ''' Introduces a pause between night actions so each player has time to get
+    back to their seat. '''
+    if not logger.is_debug_mode():
+        time.sleep(4)
 
 
 def play_night(cycle_count):
     ''' Simulates the next night phase in the game. '''
 
     # These symbolise if the respective turns can still act at night
-    assn_turn = bool(alive_cnt[ct.ASSN_IDX])
-    police_turn = bool(alive_cnt[ct.POLICE_IDX])
-    doctor_turn = bool(alive_cnt[ct.DOCTOR_IDX])
-    mutilator_turn = bool(alive_cnt[ct.MTLT_IDX])
+    assn_turn = bool(alive_cnt[pl.Player.ASSN_IDX])
+    police_turn = bool(alive_cnt[pl.Player.POLICE_IDX])
+    doctor_turn = bool(alive_cnt[pl.Player.DOCTOR_IDX])
+    mutilator_turn = bool(alive_cnt[pl.Player.MTLT_IDX])
 
     logger.log_info('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
     logger.output('Everyone goes to sleep.\n')
 
+    pause_between_roles()
     assassinated = assn_night(assn_turn)
+    pause_between_roles()
+
     police_night(police_turn)
+    pause_between_roles()
+
     mutilated, mutilated_area = mutilator_night(mutilator_turn)
+    pause_between_roles()
+
     patient = doctor_night(doctor_turn)
+    pause_between_roles()
 
     if patient and patient == mutilated:
         mutilated = None
+    elif not patient and mutilated and mutilated_area == 'H':
+        player_data[mutilated].set_can_vote(False)
 
     if patient and patient == assassinated:
         assassinated = None
@@ -356,30 +336,27 @@ def log_results():
         logger.output("The town won!\n")
 
     logger.log_info('\n')
-    logger.log_mafia(player_roles, player_alive)
-    logger.log_town(player_roles, player_alive)
-    logger.log_suicidal(player_roles, player_alive)
+    logger.log_mafia(player_data)
+    logger.log_town(player_data)
+    logger.log_suicidal(player_data)
 
 
-# Execution starts here
-parser = ArgumentParser()
-parser.add_argument('-x', '--textonly', action='store_true',
-                    help='Do not use voice commands')
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('-x', '--textonly', action='store_true',
+                        help='Do not use voice output')
 
-parser.add_argument('-d', '--debug', action='store_true',
-                    help='All input comes from console')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='All input comes from console')
 
-args = parser.parse_args()
-logger.set_debug_mode(args.debug)
-logger.set_speak_mode(not args.textonly)
+    args = parser.parse_args()
+    logger.set_debug_mode(args.debug)
+    logger.set_speak_mode(not args.textonly)
 
-if assign_roles():
-    sys.exit()
+    if assign_roles():
+        sys.exit()
 
-logger.dbg_log_all_roles(player_roles)
+    logger.dbg_log_all_roles(player_data)
 
-play_game()
-log_results()
-# TODO: (Chris) implement hand mutilation logic (day voting)
-# TODO: (Chris) Switch to the email UI
-# TODO: (Chris) Make the breaks between roles during the night bigger so people have time(for real games)
+    play_game()
+    log_results()

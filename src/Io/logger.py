@@ -7,7 +7,7 @@ try:
 except ImportError:
     pass
 
-import player as pl
+import Player.player as pl
 
 DEBUG_MODE = None
 SPEAK_MODE = None

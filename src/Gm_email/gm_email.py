@@ -1,7 +1,14 @@
 ''' E-mail functionality '''
 
-import logger
 import smtplib
+import Io.logger as logger
+
+
+def get_msg_from_name(name, player_data):
+    ''' Returns message to email to player containing role. '''
+    return 'Hi ' + name + '! Your role for this round is ' +\
+           player_data[name].get_role_name() + '.'
+
 
 def send_email(to_email, message):
     ''' Sends an email with a certain message. '''

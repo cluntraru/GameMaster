@@ -40,6 +40,7 @@ def get_players_number():
 
     return int(field_number)
 
+
 def get_emails_form(players_number):
     '''creates and shows email form'''
     curr_window = Tk()
@@ -91,6 +92,7 @@ def show_info(curr_info):
     done_button.pack()
     curr_window.mainloop()
 
+
 def create_voting_screen(player_window, player_names, vote_function): #populates all voting screens
     '''screen populating function'''
     top_frame = Frame(player_window)
@@ -111,7 +113,8 @@ def create_voting_screen(player_window, player_names, vote_function): #populates
 
     player_window.mainloop()  # make sure buttons are constantly displayed
 
-def day_vote(players_can_vote,votable_players):
+
+def day_vote(players_can_vote, votable_players):
     '''day vote'''
     player_votes = {}
     for player_name in votable_players:
@@ -137,6 +140,7 @@ def day_vote(players_can_vote,votable_players):
     print("The victim was: " + hanged_player)
     return hanged_player
 
+
 def night_assassin_vote(town_names):
     '''assassin vote'''
     curr_window = Tk()
@@ -156,6 +160,7 @@ def night_assassin_vote(town_names):
 
     global assassinated_person
     return assassinated_person
+
 
 def night_cop_vote(player_names):
     '''cop vote'''
@@ -177,6 +182,7 @@ def night_cop_vote(player_names):
     global checked_person
     return checked_person
 
+
 def night_doctor_vote(player_names):
     '''doctor vote'''
     curr_window = Tk()
@@ -196,6 +202,7 @@ def night_doctor_vote(player_names):
 
     global saved_person
     return saved_person
+
 
 def night_mutilator_vote(player_names):
     '''mutilator vote'''
@@ -231,6 +238,6 @@ def night_mutilator_vote(player_names):
 #lista = ["Marcel", "Ionela", "Trump", "Putin", "Atcineva"]
 #lista.extend(lista)
 #lista.append("DA")
-players_number=get_players_number()
-get_emails_form(players_number)
+# players_number=get_players_number()
+# get_emails_form(players_number)
 #show_info("hello")

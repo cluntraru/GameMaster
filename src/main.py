@@ -1,5 +1,4 @@
 ''' Implementation of the storyteller in the popular game 'Mafia' '''
-# bloro99@hotmail.com you can spam this email
 
 import random
 import math
@@ -153,12 +152,15 @@ def restore_voting_rights():
 
 def play_day(cycle_count):
     ''' Simulates the next daytime phase in the game. '''
-    logger.log_info('Still alive: '  + str(get_alive_players()))
+    still_alive = get_alive_players()
+    can_vote = get_voting_players()
+
+    logger.log_info('Still alive: '  + str(still_alive))
 
     if logger.is_debug_mode():
         lynched_name = input('Name of lynched player: ')
     else:
-        lynched_name = ui.day_vote(get_voting_players())
+        lynched_name = ui.day_vote(can_vote, still_alive)
 
     if lynched_name != 'NONE':
         while lynched_name not in player_data or not player_data[lynched_name].get_alive():

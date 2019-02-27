@@ -49,6 +49,7 @@ def get_emails_form(players_number):
     label_0.place(x=90, y=53)
     entries = []
     labels = []
+
     emails_and_names = []
     for i in range(0, players_number):
         labels.append(Label(curr_window, text="player number " + str(i) + " name:", width=20, font=("bold", 10)))
@@ -117,7 +118,6 @@ def day_vote(players_can_vote,votable_players):
         player_votes[player_name] = 0
     player_votes[NOBODY] = 0
     for player_name in players_can_vote:
-
         curr_window = Tk()
         curr_player = player_name
         curr_window.title("DAY PHASE: " + curr_player + " votes ")
@@ -129,7 +129,6 @@ def day_vote(players_can_vote,votable_players):
             return callback
 
         create_voting_screen(curr_window, votable_players, day_vote_function)
-
 
     hanged_player = NOBODY
     for player_name in votable_players:

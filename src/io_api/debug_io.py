@@ -1,8 +1,8 @@
 ''' Functions that ask for input from console. '''
 import random
-import Io.logger as logger
-import Player.player as pl
-import Gm_email.gm_email as email
+import io_api.logger as logger
+import player_api.player as pl
+import email_api.gm_email as email
 
 def get_player_cnt():
     return int(input('Enter number of players: '))

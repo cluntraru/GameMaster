@@ -6,11 +6,10 @@ import sys
 import time
 from argparse import ArgumentParser
 
-import Gm_email.gm_email as gm_email
-import Ui.ui as ui
-import Io.facade_io as io
-import Io.logger as logger
-import Player.player as pl
+import email_api.gm_email as gm_email
+import io_api.facade_io as io
+import io_api.logger as logger
+import player_api.player as pl
 
 suicidal_lynched = False
 

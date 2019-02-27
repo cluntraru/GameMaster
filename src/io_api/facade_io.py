@@ -1,7 +1,7 @@
 ''' Facade for getting input. '''
-import Io.release_io as rlio
-import Io.debug_io as dbgio
-import Io.logger as logger
+import io_api.release_io as rlio
+import io_api.debug_io as dbgio
+import io_api.logger as logger
 
 def get_player_cnt():
     if logger.is_debug_mode():
@@ -53,6 +53,6 @@ def get_mutilator_target(player_data, targets):
 
 def get_doctor_target(player_data, targets):
     if logger.is_debug_mode():
-        return dbgio.get_mutilator_target(player_data)
+        return dbgio.get_doctor_target(player_data)
     else:
-        return rlio.get_mutilator_target(targets)
+        return rlio.get_doctor_target(targets)

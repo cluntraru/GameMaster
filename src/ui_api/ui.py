@@ -1,8 +1,7 @@
 '''Ui of mafia storyteller'''
-
 from tkinter import Frame, Tk, Button, Text, LEFT, BOTTOM, INSERT, Label, Entry
 from math import floor
-import Io.logger as logger
+import io_api.logger as logger
 
 COLORS = ["red", "green", "blue", "brown", "orange", "purple"]
 NOBODY = "NONE"

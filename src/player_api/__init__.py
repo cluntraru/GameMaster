@@ -1,2 +1,2 @@
 ''' Package initialization. '''
-import Player.player
+import player_api.player

@@ -1,8 +1,8 @@
 ''' Functions that get input from UI. '''
 import random
-import Player.player as pl
-import Ui.ui as ui
-import Gm_email.gm_email as email
+import player_api.player as pl
+import ui_api.ui as ui
+import email_api.gm_email as email
 
 def get_player_cnt():
     return ui.get_players_number()

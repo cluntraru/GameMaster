@@ -1,5 +1,4 @@
 ''' Implements the Player class. '''
-
 class Player:
     ''' Manages essential information on each player. '''
     PLAYER_IDX = 0

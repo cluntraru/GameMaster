@@ -1,7 +1,6 @@
 ''' E-mail functionality '''
-
 import smtplib
-import Io.logger as logger
+import io_api.logger as logger
 
 
 def get_msg_from_name(name, player_data):

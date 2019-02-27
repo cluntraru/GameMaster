@@ -1,2 +1,2 @@
 ''' Package initialization. '''
-import Ui.ui
+import ui_api.ui

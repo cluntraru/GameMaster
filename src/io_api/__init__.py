@@ -1,2 +1,2 @@
 ''' Package initialization. '''
-import Gm_email.gm_email
+import io_api.facade_io

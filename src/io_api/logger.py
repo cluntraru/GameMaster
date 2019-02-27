@@ -1,5 +1,4 @@
 ''' This deals with all the output '''
-
 import sys
 import os
 try:
@@ -7,7 +6,7 @@ try:
 except ImportError:
     pass
 
-import Player.player as pl
+import player_api.player as pl
 
 DEBUG_MODE = None
 SPEAK_MODE = None

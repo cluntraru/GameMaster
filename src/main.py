@@ -8,7 +8,7 @@ import sys
 import os
 import time
 import gm_email
-import ui.ui as ui
+import ui
 import logger
 import constants as ct
 from argparse import ArgumentParser

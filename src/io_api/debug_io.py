@@ -5,10 +5,14 @@ import player_api.player as pl
 import email_api.gm_email as email
 
 def get_player_cnt():
+    ''' Console prompts for number of players and returns the
+    result. '''
     return int(input('Enter number of players: '))
 
 
 def get_names_emails(role_list, player_cnt, player_data):
+    ''' Console prompts for player names and emails and returns a
+    pair of arrays. '''
     emails = []
     msgs = []
     for i in range(player_cnt):
@@ -30,6 +34,7 @@ def get_names_emails(role_list, player_cnt, player_data):
 
 
 def get_lynched_name():
+    ''' Console prompts for name of player to lynch. '''
     return input('Name of lynched player: ')
 
 
@@ -39,6 +44,7 @@ def _valid_target(player_name, player_data):
 
 
 def get_assn_target(player_data):
+    ''' Console prompts for assassination target and returns the result. '''
     assassinated = input('Person to assassinate: ')
     while not _valid_target(assassinated, player_data) or\
           player_data[assassinated].is_assn():
@@ -49,19 +55,25 @@ def get_assn_target(player_data):
 
 
 def get_police_target(player_data):
+    ''' Console prompts for police interrogation and returns the chosen
+    person's name. '''
     police_query = input('Person to query: ')
     while not _valid_target(police_query, player_data):
         police_query = input('Invalid target. Person to query: ')
 
 
 def show_police_answer(player_data, target):
+    ''' Console alerts whether the person interrogated by the police is an
+    assassin or not. '''
     if player_data[target].is_assn():
         logger.log_info('The person you queried is an assassin.\n')
-    elif police_query:
-        logger.log_info('The person you queried is NOT an assassin.\n')    
+    else:
+        logger.log_info('The person you queried is NOT an assassin.\n')
 
 
 def get_mutilator_target(player_data):
+    ''' Console prompts for mutilatotion target and target area and returns a
+    pair. '''
     mutilated = input('Person to mutilate: ')
     while not _valid_target(mutilated, player_data):
         mutilated = input('Invalid target. Person to mutilate: ')
@@ -75,6 +87,7 @@ def get_mutilator_target(player_data):
 
 
 def get_doctor_target(player_data):
+    ''' Console prompts for doctor target and returns their name. '''
     patient = input('Person to protect: ')
     while not _valid_target(patient, player_data):
         patient = input('Invalid target. Person to protect: ')

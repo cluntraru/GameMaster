@@ -19,8 +19,7 @@ player_data = {}
 
 def assign_roles():
     ''' Randomly generates roles for each of the players. Also asks for number
-    of players and names.
-    '''
+    of players and names. '''
     roles_cnt = [0, 0, 0, 0, 0, 0, 0]
     roles_cnt[pl.Player.PLAYER_IDX] = io.get_player_cnt()
 
@@ -86,7 +85,8 @@ def kill(player_name):
 
 def mafia_won():
     ''' True if mafia satisfies their win condition, False otherwise. '''
-    return alive_cnt[pl.Player.ASSN_IDX] >= alive_cnt[pl.Player.PLAYER_IDX] - alive_cnt[pl.Player.ASSN_IDX]
+    return alive_cnt[pl.Player.ASSN_IDX] >= alive_cnt[pl.Player.PLAYER_IDX] -\
+           alive_cnt[pl.Player.ASSN_IDX]
 
 
 def town_won():

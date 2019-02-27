@@ -1,11 +1,13 @@
 ''' This deals with all the output '''
+
 import sys
-import constants as ct
 import os
 try:
     import win32com.client
 except ImportError:
     pass
+
+import constants as ct
 
 DEBUG_MODE = None
 SPEAK_MODE = None
@@ -15,7 +17,7 @@ SPEAKER = None
 def win32_speak_init():
     ''' Initialize Windows TTS. '''
     global SPEAKER
-    if SPEAKER == None:
+    if SPEAKER is None:
         SPEAKER = win32com.client.Dispatch("SAPI.SpVoice")
 
 
@@ -23,7 +25,6 @@ def speak(text):
     ''' Wrapper for platform specific text-to-speech functionality. Should be
     called similar to print().
     '''
-    # TODO: (Chris) add text-to-speech for Windows and Linux
     if sys.platform == 'darwin':
         os.system('say ' + '"' + text + '"')
     elif sys.platform == 'win32':
@@ -37,7 +38,7 @@ def log_info(text):
 
 
 def log_debug(text):
-    ''' Prints information to console if debug mode is enabled. '''    
+    ''' Prints information to console if debug mode is enabled. '''
     if DEBUG_MODE:
         print(text)
 
@@ -56,7 +57,7 @@ def output(text):
 def set_debug_mode(debug_mode):
     ''' Sets speak mode ONCE. '''
     global DEBUG_MODE
-    if DEBUG_MODE == None:
+    if DEBUG_MODE is None:
         DEBUG_MODE = debug_mode
     else:
         log_debug('Attempt to set debug mode more than once.')
@@ -66,7 +67,7 @@ def set_debug_mode(debug_mode):
 def set_speak_mode(speak_mode):
     ''' Sets debug mode ONCE. '''
     global SPEAK_MODE
-    if SPEAK_MODE == None:
+    if SPEAK_MODE is None:
         SPEAK_MODE = speak_mode
     else:
         log_debug('Attempt to set speak mode more than once.')
@@ -112,7 +113,7 @@ def log_town(player_data):
     for player_name in player_data:
         if player_data[player_name].get_role_idx() == ct.ASSN_IDX or\
            player_data[player_name].get_role_idx() == ct.SUICD_IDX:
-           
+
             continue
 
         log_player(player_name, player_data)
@@ -132,5 +133,6 @@ def log_suicidal(player_data):
 
 
 def dbg_log_all_roles(player_data):
+    ''' Prints all roles in debug mode. '''
     for player_name in player_data:
         log_debug(player_name + ' the ' + player_data[player_name].get_role_name() + '.')

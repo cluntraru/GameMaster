@@ -1,4 +1,7 @@
+''' Implements the Player class. '''
+
 class Player:
+    ''' Manages essential information on each player. '''
     _PLAYER_IDX = 0
     _ASSN_IDX = 1
     _POLICE_IDX = 2
@@ -19,17 +22,17 @@ class Player:
         ''' Returns if the player is alive. '''
         return self._alive
 
-    
+
     def die(self):
         ''' Removes the player from the game. '''
         self._alive = False
 
-    
+
     def get_can_vote(self):
         ''' Returns if player can vote at the current moment. '''
         return self._can_vote
 
-    
+
     def set_can_vote(self, can_vote):
         ''' Sets if a player can vote. '''
         self._can_vote = can_vote

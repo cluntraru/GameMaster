@@ -1,17 +1,17 @@
 ''' Implementation of the storyteller in the popular game 'Mafia' '''
 # bloro99@hotmail.com you can spam this email
 
-import player
 import random
 import math
 import sys
-import os
 import time
+from argparse import ArgumentParser
+
+import player
 import gm_email
 import ui
 import logger
 import constants as ct
-from argparse import ArgumentParser
 
 suicidal_lynched = False
 
@@ -180,6 +180,7 @@ def valid_target(player_name):
 
 
 def get_alive_players_minus_role(role_idx):
+    ''' Get all live players except those that have a certain role. '''
     targets = []
     for name in player_data:
         if player_data[name].get_alive() and player_data[name].get_role_idx() != role_idx:
@@ -303,6 +304,8 @@ def doctor_night(doctor_turn):
 
 
 def pause_between_roles():
+    ''' Introduces a pause between night actions so each player has time to get
+    back to their seat. '''
     if not logger.is_debug_mode():
         time.sleep(4)
 

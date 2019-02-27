@@ -53,12 +53,12 @@ def get_emails_form(players_number):
 
     emails_and_names = []
     for i in range(0, players_number):
-        labels.append(Label(curr_window, text="player number " + str(i) + " name:", width=20, font=("bold", 10)))
+        labels.append(Label(curr_window, text="Player " + str(i + 1) + " name:", width=20, font=("bold", 10)))
         labels[i*2].place(x=LEFT_SHIFT*4*floor(i/MAX_ENTRIES), y=130+30*(i%MAX_ENTRIES))
         entries.append(Entry(curr_window))
         entries[i*2].place(x=LEFT_SHIFT*(4*(floor(i/MAX_ENTRIES))+1), y=130+30*(i % MAX_ENTRIES))
 
-        labels.append(Label(curr_window, text="player " + str(i) + " email:", width=20, font=("bold", 10)))
+        labels.append(Label(curr_window, text="Player " + str(i + 1) + " email:", width=20, font=("bold", 10)))
         labels[i * 2 + 1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 2), y=130 + 30 * (i % MAX_ENTRIES))
         entries.append(Entry(curr_window))
         entries[i * 2 +1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 3), y=130 + 30 * (i % MAX_ENTRIES))
@@ -66,7 +66,7 @@ def get_emails_form(players_number):
     def get_vals():
         '''gets emails from fields'''
         for i in range(0, players_number):
-            emails_and_names.append(entries[i*2].get(), entries[i * 2 + 1].get())
+            emails_and_names.append((entries[i*2].get(), entries[i * 2 + 1].get()))
         curr_window.destroy()
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
@@ -239,5 +239,5 @@ def night_mutilator_vote(player_names):
 #lista.extend(lista)
 #lista.append("DA")
 # players_number=get_players_number()
-# get_emails_form(players_number)
+# print(get_emails_form(5))
 #show_info("hello")

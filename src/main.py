@@ -17,12 +17,23 @@ alive_cnt = []
 
 player_data = {}
 
+def get_msg_from_name(name):
+    ''' Returns message to email to player containing role. '''
+    return 'Hi ' + name + '! Your role for this round is ' +\
+           player_data[name].get_role_name() + '.'
+
+
 def assign_roles():
     ''' Randomly generates roles for each of the players. Also asks for number
     of players and names.
     '''
     roles_cnt = [0, 0, 0, 0, 0, 0, 0]
-    roles_cnt[pl.Player.PLAYER_IDX] = int(input('Enter number of players: '))
+
+    if logger.is_debug_mode():
+        roles_cnt[pl.Player.PLAYER_IDX] = int(input('Enter number of players: '))
+    else:
+        roles_cnt[pl.Player.PLAYER_IDX] = ui.get_players_number()
+
     if roles_cnt[pl.Player.PLAYER_IDX] < 5:
         logger.output('Unfortunately, you cannot play with less than 5 people :(')
         return -1
@@ -65,27 +76,33 @@ def assign_roles():
 
     emails = []
     msgs = []
-    for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
-        curr_name = input('Enter player ' + str(i + 1) + ' name: ')
-        while (curr_name == '' or curr_name in player_data):
-            curr_name = input('Please choose another name: ')
+    if logger.is_debug_mode():
+        for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
+            curr_name = input('Enter player ' + str(i + 1) + ' name: ')
+            while (curr_name == '' or curr_name in player_data):
+                curr_name = input('Please choose another name: ')
 
-        curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
-        # sure = input('Are you sure (y for yes)?')
-        # while sure != 'y':
-        #     curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
-        #     sure = input('Are you sure (y for yes)?')
+            curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
 
-        rand_index = random.randint(0, len(role_list) - 1)
-        player_data[curr_name] = pl.Player(role_list.pop(rand_index))
-        # player_data[curr_name].get_role_idx() = role_list.pop(rand_index)
-        # player_data[curr_name].get_alive() = True
+            rand_index = random.randint(0, len(role_list) - 1)
+            player_data[curr_name] = pl.Player(role_list.pop(rand_index))
 
-        curr_msg = 'Hi ' + curr_name + '! Your role for this round is ' +\
-                   player_data[curr_name].get_role_name() + '.'
+            curr_msg = get_msg_from_name(curr_name)
 
-        emails.append(curr_email)
-        msgs.append(curr_msg)
+            emails.append(curr_email)
+            msgs.append(curr_msg)
+    else:
+        names_emails = ui.get_emails_form(roles_cnt[pl.Player.PLAYER_IDX])
+        for name_email in names_emails:
+            curr_name, curr_email = name_email
+
+            rand_index = random.randint(0, len(role_list) - 1)
+            player_data[curr_name] = pl.Player(role_list.pop(rand_index))
+
+            curr_msg = get_msg_from_name(curr_name)
+
+            emails.append(curr_email)
+            msgs.append(curr_msg)
 
     for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
         gm_email.send_email(emails[i], msgs[i])
@@ -323,6 +340,7 @@ def play_night(cycle_count):
     logger.log_info('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
     logger.output('Everyone goes to sleep.\n')
 
+    pause_between_roles()
     assassinated = assn_night(assn_turn)
     pause_between_roles()
 
@@ -333,6 +351,7 @@ def play_night(cycle_count):
     pause_between_roles()
 
     patient = doctor_night(doctor_turn)
+    pause_between_roles()
 
     if patient and patient == mutilated:
         mutilated = None

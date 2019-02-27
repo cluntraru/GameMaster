@@ -208,6 +208,14 @@ def get_police_targets():
     return get_alive_players_minus_role(ct.POLICE_IDX)
 
 
+def fake_night_action():
+    ''' Waits for some time to fake that someone acted if said role
+    no longer exists in game. '''
+    if not logger.is_debug_mode():
+        sleep_time = random.randint(6, 10)
+        time.sleep(sleep_time)
+
+
 def assn_night(assn_turn):
     ''' Simulates the assassins' night phase '''
     logger.output('The assassins wake up.')
@@ -221,8 +229,7 @@ def assn_night(assn_turn):
         assassinated = ui.night_assassin_vote(get_assn_targets())
     else:
         assassinated = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     logger.output('The assassins go to sleep.\n')
     return assassinated
@@ -239,8 +246,7 @@ def police_night(police_turn):
         police_query = ui.night_cop_vote(get_police_targets())
     else:
         police_query = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     if logger.is_debug_mode():
         if police_query and player_data[police_query].get_role_idx() == ct.ASSN_IDX:
@@ -273,8 +279,7 @@ def mutilator_night(mutilator_turn):
     else:
         mutilated = None
         mutilated_area = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     logger.output('The mutilators go to sleep.\n')
     return mutilated, mutilated_area
@@ -291,11 +296,15 @@ def doctor_night(doctor_turn):
         patient = ui.night_doctor_vote(get_doctor_targets())
     else:
         patient = None
-        sleep_time = random.randint(6, 10)
-        time.sleep(sleep_time)
+        fake_night_action()
 
     logger.output('The doctors go to sleep.\n')
     return patient
+
+
+def pause_between_roles():
+    if not logger.is_debug_mode():
+        time.sleep(4)
 
 
 def play_night(cycle_count):
@@ -311,8 +320,14 @@ def play_night(cycle_count):
     logger.output('Everyone goes to sleep.\n')
 
     assassinated = assn_night(assn_turn)
+    pause_between_roles()
+
     police_night(police_turn)
+    pause_between_roles()
+
     mutilated, mutilated_area = mutilator_night(mutilator_turn)
+    pause_between_roles()
+
     patient = doctor_night(doctor_turn)
 
     if patient and patient == mutilated:
@@ -380,7 +395,7 @@ def log_results():
 # Execution starts here
 parser = ArgumentParser()
 parser.add_argument('-x', '--textonly', action='store_true',
-                    help='Do not use voice commands')
+                    help='Do not use voice output')
 
 parser.add_argument('-d', '--debug', action='store_true',
                     help='All input comes from console')

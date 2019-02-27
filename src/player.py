@@ -2,13 +2,13 @@
 
 class Player:
     ''' Manages essential information on each player. '''
-    _PLAYER_IDX = 0
-    _ASSN_IDX = 1
-    _POLICE_IDX = 2
-    _SUICD_IDX = 3
-    _DOCTOR_IDX = 4
-    _MTLT_IDX = 5
-    _POTATO_IDX = 6
+    PLAYER_IDX = 0
+    ASSN_IDX = 1
+    POLICE_IDX = 2
+    SUICD_IDX = 3
+    DOCTOR_IDX = 4
+    MTLT_IDX = 5
+    POTATO_IDX = 6
 
     _ROLE_NAMES = ['ERROR', 'assassin', 'policeman', 'suicidal person',\
                       'doctor', 'mutilator', 'townie']
@@ -50,29 +50,29 @@ class Player:
 
     def is_assn(self):
         ''' Returns if player is an assassin. '''
-        return self._role_idx == self._ASSN_IDX
+        return self._role_idx == self.ASSN_IDX
 
 
     def is_police(self):
         ''' Returns if player is a policeman. '''
-        return self._role_idx == self._POLICE_IDX
+        return self._role_idx == self.POLICE_IDX
 
 
     def is_suicidal(self):
         ''' Returns if player is a suicidal person. '''
-        return self._role_idx == self._SUICD_IDX
+        return self._role_idx == self.SUICD_IDX
 
 
     def is_doctor(self):
         ''' Returns if player is a doctor. '''
-        return self._role_idx == self._DOCTOR_IDX
+        return self._role_idx == self.DOCTOR_IDX
 
 
     def is_mutilator(self):
         ''' Returns if player is a mutilator. '''
-        return self._role_idx == self._MTLT_IDX
+        return self._role_idx == self.MTLT_IDX
 
 
     def is_potato(self):
         ''' Returns if player is a townie. '''
-        return self._role_idx == self._POTATO_IDX
+        return self._role_idx == self.POTATO_IDX

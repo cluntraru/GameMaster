@@ -6,11 +6,10 @@ import sys
 import time
 from argparse import ArgumentParser
 
-import player
 import gm_email
 import ui
 import logger
-import constants as ct
+import player as pl
 
 suicidal_lynched = False
 
@@ -23,50 +22,50 @@ def assign_roles():
     of players and names.
     '''
     roles_cnt = [0, 0, 0, 0, 0, 0, 0]
-    roles_cnt[ct.PLAYER_IDX] = int(input('Enter number of players: '))
-    if roles_cnt[ct.PLAYER_IDX] < 5:
+    roles_cnt[pl.Player.PLAYER_IDX] = int(input('Enter number of players: '))
+    if roles_cnt[pl.Player.PLAYER_IDX] < 5:
         logger.output('Unfortunately, you cannot play with less than 5 people :(')
         return -1
 
-    if roles_cnt[ct.PLAYER_IDX] > 20:
+    if roles_cnt[pl.Player.PLAYER_IDX] > 20:
         logger.output('Unfortunately, you cannot play with more than 20 people :(')
         return -1
 
-    roles_cnt[ct.ASSN_IDX] = math.floor(1 + (roles_cnt[ct.PLAYER_IDX] - 5) / 4)
-    roles_cnt[ct.POLICE_IDX] = math.floor(1 + (roles_cnt[ct.PLAYER_IDX] - 5) / 5)
-    roles_cnt[ct.SUICD_IDX] = 1
-    roles_cnt[ct.DOCTOR_IDX] = 1 + (roles_cnt[ct.PLAYER_IDX] >= 10)
-    roles_cnt[ct.MTLT_IDX] = 1 + (roles_cnt[ct.PLAYER_IDX] >= 10)
-    roles_cnt[ct.POTATO_IDX] = roles_cnt[ct.PLAYER_IDX] - roles_cnt[ct.ASSN_IDX] - \
-                            roles_cnt[ct.POLICE_IDX] - roles_cnt[ct.SUICD_IDX] - \
-                            roles_cnt[ct.DOCTOR_IDX] - roles_cnt[ct.MTLT_IDX]
+    roles_cnt[pl.Player.ASSN_IDX] = math.floor(1 + (roles_cnt[pl.Player.PLAYER_IDX] - 5) / 4)
+    roles_cnt[pl.Player.POLICE_IDX] = math.floor(1 + (roles_cnt[pl.Player.PLAYER_IDX] - 5) / 5)
+    roles_cnt[pl.Player.SUICD_IDX] = 1
+    roles_cnt[pl.Player.DOCTOR_IDX] = 1 + (roles_cnt[pl.Player.PLAYER_IDX] >= 10)
+    roles_cnt[pl.Player.MTLT_IDX] = 1 + (roles_cnt[pl.Player.PLAYER_IDX] >= 10)
+    roles_cnt[pl.Player.POTATO_IDX] = roles_cnt[pl.Player.PLAYER_IDX] - roles_cnt[pl.Player.ASSN_IDX] - \
+                            roles_cnt[pl.Player.POLICE_IDX] - roles_cnt[pl.Player.SUICD_IDX] - \
+                            roles_cnt[pl.Player.DOCTOR_IDX] - roles_cnt[pl.Player.MTLT_IDX]
 
     global alive_cnt
     alive_cnt = roles_cnt
 
     role_list = []
-    for i in range(roles_cnt[ct.ASSN_IDX]):
-        role_list.append(ct.ASSN_IDX)
+    for i in range(roles_cnt[pl.Player.ASSN_IDX]):
+        role_list.append(pl.Player.ASSN_IDX)
 
-    for i in range(roles_cnt[ct.POLICE_IDX]):
-        role_list.append(ct.POLICE_IDX)
+    for i in range(roles_cnt[pl.Player.POLICE_IDX]):
+        role_list.append(pl.Player.POLICE_IDX)
 
-    role_list.append(ct.SUICD_IDX)
+    role_list.append(pl.Player.SUICD_IDX)
 
-    for i in range(roles_cnt[ct.DOCTOR_IDX]):
-        role_list.append(ct.DOCTOR_IDX)
+    for i in range(roles_cnt[pl.Player.DOCTOR_IDX]):
+        role_list.append(pl.Player.DOCTOR_IDX)
 
-    for i in range(roles_cnt[ct.MTLT_IDX]):
-        role_list.append(ct.MTLT_IDX)
+    for i in range(roles_cnt[pl.Player.MTLT_IDX]):
+        role_list.append(pl.Player.MTLT_IDX)
 
-    for i in range(roles_cnt[ct.POTATO_IDX]):
-        role_list.append(ct.POTATO_IDX)
+    for i in range(roles_cnt[pl.Player.POTATO_IDX]):
+        role_list.append(pl.Player.POTATO_IDX)
 
     random.shuffle(role_list)
 
     emails = []
     msgs = []
-    for i in range(roles_cnt[ct.PLAYER_IDX]):
+    for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
         curr_name = input('Enter player ' + str(i + 1) + ' name: ')
         while (curr_name == '' or curr_name in player_data):
             curr_name = input('Please choose another name: ')
@@ -78,7 +77,7 @@ def assign_roles():
         #     sure = input('Are you sure (y for yes)?')
 
         rand_index = random.randint(0, len(role_list) - 1)
-        player_data[curr_name] = player.Player(role_list.pop(rand_index))
+        player_data[curr_name] = pl.Player(role_list.pop(rand_index))
         # player_data[curr_name].get_role_idx() = role_list.pop(rand_index)
         # player_data[curr_name].get_alive() = True
 
@@ -88,7 +87,7 @@ def assign_roles():
         emails.append(curr_email)
         msgs.append(curr_msg)
 
-    for i in range(roles_cnt[ct.PLAYER_IDX]):
+    for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
         gm_email.send_email(emails[i], msgs[i])
 
     logger.log_info('\n')
@@ -100,17 +99,17 @@ def kill(player_name):
     '''
     player_data[player_name].die()
     alive_cnt[player_data[player_name].get_role_idx()] -= 1
-    alive_cnt[ct.PLAYER_IDX] -= 1
+    alive_cnt[pl.Player.PLAYER_IDX] -= 1
 
 
 def mafia_won():
     ''' True if mafia satisfies their win condition, False otherwise. '''
-    return alive_cnt[ct.ASSN_IDX] >= alive_cnt[ct.PLAYER_IDX] - alive_cnt[ct.ASSN_IDX]
+    return alive_cnt[pl.Player.ASSN_IDX] >= alive_cnt[pl.Player.PLAYER_IDX] - alive_cnt[pl.Player.ASSN_IDX]
 
 
 def town_won():
     ''' True if town satisfies their win condition, False otherwise. '''
-    return alive_cnt[ct.ASSN_IDX] == 0
+    return alive_cnt[pl.Player.ASSN_IDX] == 0
 
 
 def suicidal_won():
@@ -166,7 +165,7 @@ def play_day(cycle_count):
         while lynched_name not in player_data or not player_data[lynched_name].get_alive():
             lynched_name = input('Not a valid player.\nName of lynched player: ')
 
-        if player_data[lynched_name].get_role_idx() == ct.SUICD_IDX:
+        if player_data[lynched_name].get_role_idx() == pl.Player.SUICD_IDX:
             global suicidal_lynched
             suicidal_lynched = True
 
@@ -193,7 +192,7 @@ def get_alive_players_minus_role(role_idx):
 
 def get_assn_targets():
     ''' Returns a list of the names of valid assassination targets. '''
-    return get_alive_players_minus_role(ct.ASSN_IDX)
+    return get_alive_players_minus_role(pl.Player.ASSN_IDX)
 
 
 def get_doctor_targets():
@@ -208,7 +207,7 @@ def get_mutilator_targets():
 
 def get_police_targets():
     ''' Returns a list of the names of valid police targets. '''
-    return get_alive_players_minus_role(ct.POLICE_IDX)
+    return get_alive_players_minus_role(pl.Player.POLICE_IDX)
 
 
 def fake_night_action():
@@ -225,7 +224,7 @@ def assn_night(assn_turn):
     if assn_turn and logger.is_debug_mode():
         assassinated = input('Person to assassinate: ')
         while not valid_target(assassinated) or\
-              player_data[assassinated].get_role_idx() == ct.ASSN_IDX:
+              player_data[assassinated].get_role_idx() == pl.Player.ASSN_IDX:
 
             assassinated = input('Invalid target. Person to assassinate: ')
     elif assn_turn and not logger.is_debug_mode():
@@ -252,12 +251,12 @@ def police_night(police_turn):
         fake_night_action()
 
     if logger.is_debug_mode():
-        if police_query and player_data[police_query].get_role_idx() == ct.ASSN_IDX:
+        if police_query and player_data[police_query].get_role_idx() == pl.Player.ASSN_IDX:
             logger.log_info('The person you queried is an assassin.\n')
         elif police_query:
             logger.log_info('The person you queried is NOT an assassin.\n')
     elif not logger.is_debug_mode():
-        if police_query and player_data[police_query].get_role_idx() == ct.ASSN_IDX:
+        if police_query and player_data[police_query].get_role_idx() == pl.Player.ASSN_IDX:
             ui.show_info('The person you queried is an assassin.\n')
         elif police_query:
             ui.show_info('The person you queried is NOT an assassin.\n')
@@ -316,10 +315,10 @@ def play_night(cycle_count):
     ''' Simulates the next night phase in the game. '''
 
     # These symbolise if the respective turns can still act at night
-    assn_turn = bool(alive_cnt[ct.ASSN_IDX])
-    police_turn = bool(alive_cnt[ct.POLICE_IDX])
-    doctor_turn = bool(alive_cnt[ct.DOCTOR_IDX])
-    mutilator_turn = bool(alive_cnt[ct.MTLT_IDX])
+    assn_turn = bool(alive_cnt[pl.Player.ASSN_IDX])
+    police_turn = bool(alive_cnt[pl.Player.POLICE_IDX])
+    doctor_turn = bool(alive_cnt[pl.Player.DOCTOR_IDX])
+    mutilator_turn = bool(alive_cnt[pl.Player.MTLT_IDX])
 
     logger.log_info('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
     logger.output('Everyone goes to sleep.\n')

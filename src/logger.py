@@ -7,7 +7,7 @@ try:
 except ImportError:
     pass
 
-import constants as ct
+import player as pl
 
 DEBUG_MODE = None
 SPEAK_MODE = None
@@ -99,7 +99,7 @@ def log_mafia(player_data):
     ''' Prints all members of the mafia. '''
     log_info('Mafia:')
     for player_name in player_data:
-        if player_data[player_name].get_role_idx() != ct.ASSN_IDX:
+        if player_data[player_name].get_role_idx() != pl.Player.ASSN_IDX:
             continue
 
         log_player(player_name, player_data)
@@ -111,8 +111,8 @@ def log_town(player_data):
     ''' Prints all members of the town. '''
     log_info('Town:')
     for player_name in player_data:
-        if player_data[player_name].get_role_idx() == ct.ASSN_IDX or\
-           player_data[player_name].get_role_idx() == ct.SUICD_IDX:
+        if player_data[player_name].get_role_idx() == pl.Player.ASSN_IDX or\
+           player_data[player_name].get_role_idx() == pl.Player.SUICD_IDX:
 
             continue
 
@@ -125,7 +125,7 @@ def log_suicidal(player_data):
     ''' Prints the suicidal person. '''
     log_info('Neutral:')
     for player_name in player_data:
-        if player_data[player_name].get_role_idx() == ct.SUICD_IDX:
+        if player_data[player_name].get_role_idx() == pl.Player.SUICD_IDX:
             log_player(player_name, player_data)
             break
 

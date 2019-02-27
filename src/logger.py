@@ -13,6 +13,7 @@ SPEAK_MODE = None
 SPEAKER = None
 
 def win32_speak_init():
+    ''' Initialize Windows TTS. '''
     global SPEAKER
     if SPEAKER == None:
         SPEAKER = win32com.client.Dispatch("SAPI.SpVoice")
@@ -39,6 +40,7 @@ def log_debug(text):
     ''' Prints information to console if debug mode is enabled. '''    
     if DEBUG_MODE:
         print(text)
+
 
 def output(text):
     ''' Speaks and prints the input text if SPEAK_MODE is enabled. Prints
@@ -81,65 +83,54 @@ def is_speak_mode():
     return SPEAK_MODE
 
 
-def log_player(player_name, player_roles, player_alive):
+def log_player(player_name, player_data):
     ''' Prints the role and status (dead/alive) of a player. '''
-    if player_alive[player_name]:
+    if player_data[player_name].get_alive():
         status = 'ALIVE'
     else:
         status = 'DEAD'
 
     log_info(player_name + ' the ' +\
-             role_idx_to_name(player_roles[player_name]) + ' - ' + status)
+             player_data[player_name].get_role_name() + ' - ' + status)
 
 
-def log_mafia(player_roles, player_alive):
+def log_mafia(player_data):
     ''' Prints all members of the mafia. '''
     log_info('Mafia:')
-    for player_name in player_roles:
-        if player_roles[player_name] != ct.ASSN_IDX:
+    for player_name in player_data:
+        if player_data[player_name].get_role_idx() != ct.ASSN_IDX:
             continue
 
-        log_player(player_name, player_roles, player_alive)
+        log_player(player_name, player_data)
 
     log_info('\n')
 
 
-def log_town(player_roles, player_alive):
+def log_town(player_data):
     ''' Prints all members of the town. '''
     log_info('Town:')
-    for player_name in player_roles:
-        if player_roles[player_name] == ct.ASSN_IDX or\
-           player_roles[player_name] == ct.SUICD_IDX:
+    for player_name in player_data:
+        if player_data[player_name].get_role_idx() == ct.ASSN_IDX or\
+           player_data[player_name].get_role_idx() == ct.SUICD_IDX:
            
             continue
 
-        log_player(player_name, player_roles, player_alive)
+        log_player(player_name, player_data)
 
     log_info('\n')
 
 
-def log_suicidal(player_roles, player_alive):
+def log_suicidal(player_data):
     ''' Prints the suicidal person. '''
     log_info('Neutral:')
-    for player_name in player_roles:
-        if player_roles[player_name] == ct.SUICD_IDX:
-            log_player(player_name, player_roles, player_alive)
+    for player_name in player_data:
+        if player_data[player_name].get_role_idx() == ct.SUICD_IDX:
+            log_player(player_name, player_data)
             break
 
     log_info('\n')
 
 
-def role_idx_to_name(idx):
-    ''' Converts a role index constant to the actual role name.'''
-    if idx == 0:
-        log_debug('Invalid role index')
-        sys.exit()
-
-    role_names = ['ERROR', 'assassin', 'policeman', 'suicidal person',\
-                  'doctor', 'mutilator', 'townie']
-    return role_names[idx]
-
-
-def dbg_log_all_roles(player_roles):
-    for player_name in player_roles:
-        log_debug(player_name + ' the ' + role_idx_to_name(player_roles[player_name]) + '.')
+def dbg_log_all_roles(player_data):
+    for player_name in player_data:
+        log_debug(player_name + ' the ' + player_data[player_name].get_role_name() + '.')

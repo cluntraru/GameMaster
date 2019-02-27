@@ -21,7 +21,7 @@ def get_names_emails(role_list, player_cnt, player_data):
         rand_index = random.randint(0, len(role_list) - 1)
         player_data[curr_name] = pl.Player(role_list.pop(rand_index))
 
-        curr_msg = email.get_msg_from_name(curr_name)
+        curr_msg = email.get_msg_from_name(curr_name, player_data)
 
         emails.append(curr_email)
         msgs.append(curr_msg)
@@ -33,14 +33,14 @@ def get_lynched_name():
     return input('Name of lynched player: ')
 
 
-def _valid_target(player_name):
+def _valid_target(player_name, player_data):
     ''' Checks if a player is in the game and alive. '''
     return player_name in player_data and player_data[player_name].get_alive()
 
 
 def get_assn_target(player_data):
     assassinated = input('Person to assassinate: ')
-    while not _valid_target(assassinated) or\
+    while not _valid_target(assassinated, player_data) or\
           player_data[assassinated].is_assn():
 
         assassinated = input('Invalid target. Person to assassinate: ')
@@ -50,7 +50,7 @@ def get_assn_target(player_data):
 
 def get_police_target(player_data):
     police_query = input('Person to query: ')
-    while not _valid_target(police_query):
+    while not _valid_target(police_query, player_data):
         police_query = input('Invalid target. Person to query: ')
 
 
@@ -63,7 +63,7 @@ def show_police_answer(player_data, target):
 
 def get_mutilator_target(player_data):
     mutilated = input('Person to mutilate: ')
-    while not _valid_target(mutilated):
+    while not _valid_target(mutilated, player_data):
         mutilated = input('Invalid target. Person to mutilate: ')
 
     mutilated_area = input('Area to mutilate (M/H): ')
@@ -76,7 +76,7 @@ def get_mutilator_target(player_data):
 
 def get_doctor_target(player_data):
     patient = input('Person to protect: ')
-    while not valid_target(patient):
+    while not _valid_target(patient, player_data):
         patient = input('Invalid target. Person to protect: ')
 
     return patient

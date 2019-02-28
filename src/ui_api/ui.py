@@ -1,5 +1,5 @@
 '''Ui of mafia storyteller'''
-from tkinter import Frame, Tk, Button, Text, LEFT, BOTTOM, INSERT, Label, Entry
+from tkinter import Frame, Tk, Button, Text, LEFT, INSERT, Label, Entry
 from math import floor
 import io_api.logger as logger
 
@@ -8,6 +8,31 @@ NOBODY = "NONE"
 MAX_ENTRIES = 10
 LEFT_SHIFT = 160
 UP_SHIFT = 40
+
+class WindowSingleton:
+    '''Singleton for window'''
+    __instance = None
+    @staticmethod
+    def get_instance():
+        """ Static access method. """
+        if WindowSingleton.__instance is None:
+            WindowSingleton()
+        return WindowSingleton.__instance
+    @staticmethod
+    def use_and_destroy_instance():
+        '''Static use and destroy method'''
+        WindowSingleton.__instance.window.mainloop()
+        WindowSingleton.__instance = None
+
+    def __init__(self):
+        """ Virtually private constructor. """
+        if WindowSingleton.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            self.window = Tk()
+            WindowSingleton.__instance = self
+
+
 
 assassinated_person = NOBODY
 checked_person = NOBODY
@@ -18,14 +43,14 @@ field_number = "-1"
 
 def get_players_number():
     '''gets players number'''
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
     curr_window.title("Players number")
 
-    text_label = Label(curr_window, text="Insert number of players:", width=20, font=("bold",10))
-    text_label.place(x = 10, y = UP_SHIFT)
+    text_label = Label(curr_window, text="Insert number of players:", width=20, font=("bold", 10))
+    text_label.place(x=10, y=UP_SHIFT)
     number_entry = Entry(curr_window)
-    number_entry.place(x = 20, y = UP_SHIFT * 2)
+    number_entry.place(x=20, y=UP_SHIFT * 2)
     def get_val():
         '''gets number from field'''
         global field_number
@@ -37,8 +62,8 @@ def get_players_number():
         else:
             curr_window.destroy()
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_val)
-    done_button.place(x = 20, y = UP_SHIFT * 3)
-    curr_window.mainloop()
+    done_button.place(x=20, y=UP_SHIFT * 3)
+    WindowSingleton.use_and_destroy_instance()
     if (int(field_number)) == -1:
         logger.log_debug("Window for getting players number closed\n")
     else:
@@ -48,7 +73,7 @@ def get_players_number():
 
 def get_emails_form(players_number):
     '''creates and shows email form'''
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
     curr_window.title("Email Form")
     text_label = Label(curr_window, text="Email Form", width=40, font=("bold", 20))
@@ -70,10 +95,10 @@ def get_emails_form(players_number):
     def check_different_names():
         different_names = True
         nonlocal emails_and_names
-        for i in range(0,players_number):
-            for j in range(0,players_number):
-                if i!=j:
-                    if(emails_and_names[i][0] == emails_and_names[j][0]):
+        for i in range(0, players_number):
+            for j in range(0, players_number):
+                if i != j:
+                    if emails_and_names[i][0] == emails_and_names[j][0]:
                         different_names = False
         return different_names
 
@@ -96,22 +121,22 @@ def get_emails_form(players_number):
 
         if different_names and nonempty_names:
             curr_window.destroy()
-        elif nonempty_names == False:
+        elif nonempty_names is False:
             text_label['text'] = "One or more names are empty"
-        elif different_names == False:
+        elif different_names is False:
             text_label['text'] = "Two or more names are identical"
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.place(x=80+LEFT_SHIFT*floor(players_number/MAX_ENTRIES), y=130+30*(MAX_ENTRIES+1))
-    curr_window.mainloop()
-    if(len(emails_and_names) == 0):
+    WindowSingleton.use_and_destroy_instance()
+    if not emails_and_names == 0:
         logger.log_debug("Window for emails and names was closed\n")
     return emails_and_names
 
 
 def show_info(curr_info):
     '''shows info, mostly for cop'''
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.title("Night Report For Cop")
     def destroy_window():
         '''destroys window'''
@@ -122,7 +147,7 @@ def show_info(curr_info):
     screen_info.pack()
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=destroy_window)
     done_button.pack()
-    curr_window.mainloop()
+    WindowSingleton.use_and_destroy_instance()
     logger.log_debug("Info window closed")
 
 def create_voting_screen(player_window, player_names, vote_function): #populates all voting screens
@@ -143,7 +168,7 @@ def create_voting_screen(player_window, player_names, vote_function): #populates
         done_button = Button(curr_frame, fg=COLORS[i % len(COLORS)], height=20, width=17, text=player_name, command=vote_function(player_window, player_name))
         done_button.pack(side=LEFT)
 
-    player_window.mainloop()  # make sure buttons are constantly displayed
+    WindowSingleton.use_and_destroy_instance()  # make sure buttons are constantly displayed
     logger.log_debug("Voting screen closed")
 
 
@@ -154,7 +179,7 @@ def day_vote(players_can_vote, votable_players):
         player_votes[player_name] = 0
     player_votes[NOBODY] = 0
     for player_name in players_can_vote:
-        curr_window = Tk()
+        curr_window = WindowSingleton.get_instance().window
         curr_player = player_name
         curr_window.title("DAY PHASE: " + curr_player + " votes ")
 
@@ -178,7 +203,7 @@ def night_assassin_vote(town_names):
     '''assassin vote'''
     global assassinated_person
     assassinated_person = NOBODY
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.title("NIGHT PHASE: " +  "Assassins kill: ")
 
     def assassin_vote_function(player_window, player_name):
@@ -201,7 +226,7 @@ def night_cop_vote(player_names):
     '''cop vote'''
     global checked_person
     checked_person = NOBODY
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.title("NIGHT PHASE: " +  "Cop checks: ")
 
     def cop_vote_function(player_window, player_name):
@@ -224,7 +249,7 @@ def night_doctor_vote(player_names):
     '''doctor vote'''
     global saved_person
     saved_person = NOBODY
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.title("NIGHT PHASE: " +  "Doctor saves: ")
 
     def doctor_vote_function(player_window, player_name):
@@ -245,7 +270,7 @@ def night_doctor_vote(player_names):
 
 def night_mutilator_vote(player_names):
     '''mutilator vote'''
-    global mutilated_person,mutilation_place
+    global mutilated_person, mutilation_place
     mutilated_person = NOBODY
     mutilation_place = NOBODY
     def mutilator_vote_function(player_window, player_name):
@@ -266,12 +291,12 @@ def night_mutilator_vote(player_names):
 
         return callback
 
-    curr_window = Tk()
+    curr_window = WindowSingleton.get_instance().window
     curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
     create_voting_screen(curr_window, player_names, mutilator_vote_function)
 
     if mutilated_person != NOBODY:
-        curr_window = Tk()
+        curr_window = WindowSingleton.get_instance().window
         curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
         create_voting_screen(curr_window, ["Hand", "Mouth"], mutilator_place_function)
 

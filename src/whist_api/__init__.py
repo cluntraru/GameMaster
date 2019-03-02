@@ -1,2 +1,2 @@
 ''' Package initialization. '''
-import io_api.facade_io
+import whist_api

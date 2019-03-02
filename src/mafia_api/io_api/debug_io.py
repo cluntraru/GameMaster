@@ -1,8 +1,8 @@
 ''' Functions that ask for input from console. '''
 import random
-import io_api.logger as logger
-import player_api.player as pl
-import email_api.gm_email as email
+# from mafia.io_api.mafia_logger import MafiaLogger as Logger
+from mafia_api.player_api.player import Player
+import mafia_api.email_api.gm_email as email
 
 def get_player_cnt():
     ''' Console prompts for number of players and returns the
@@ -23,7 +23,7 @@ def get_names_emails(role_list, player_cnt, player_data):
         curr_email = input('Enter player ' + str(i + 1) + ' e-mail: ')
 
         rand_index = random.randint(0, len(role_list) - 1)
-        player_data[curr_name] = pl.Player(role_list.pop(rand_index))
+        player_data[curr_name] = Player(role_list.pop(rand_index))
 
         curr_msg = email.get_msg_from_name(curr_name, player_data)
 
@@ -62,7 +62,7 @@ def get_police_target(player_data):
         police_query = input('Invalid target. Person to query: ')
 
 
-def show_police_answer(player_data, target):
+def show_police_answer(logger, player_data, target):
     ''' Console alerts whether the person interrogated by the police is an
     assassin or not. '''
     if player_data[target].is_assn():

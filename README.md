@@ -18,3 +18,5 @@ This is where references and extra information go.
 ## Useful Links
 
 [YouTrack](http://gamemaster.myjetbrains.com/)
+
+[Whist Rules](https://www.pagat.com/exact/romwhist.html)

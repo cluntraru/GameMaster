@@ -78,9 +78,10 @@ def assign_roles():
 def kill(player_name):
     ''' Removes a player from the game, updating all the necessary structures.
     '''
-    player_data[player_name].die()
-    alive_cnt[player_data[player_name].get_role_idx()] -= 1
-    alive_cnt[pl.Player.PLAYER_IDX] -= 1
+    if player_name in player_data:
+        player_data[player_name].die()
+        alive_cnt[player_data[player_name].get_role_idx()] -= 1
+        alive_cnt[pl.Player.PLAYER_IDX] -= 1
 
 
 def mafia_won():
@@ -140,7 +141,7 @@ def play_day(cycle_count):
 
     lynched_name = io.get_lynched_name(can_vote, still_alive)
 
-    if lynched_name != 'NONE':
+    if lynched_name != "NONE":
         while lynched_name not in player_data or not player_data[lynched_name].get_alive():
             lynched_name = input('Not a valid player.\nName of lynched player: ')
 

@@ -48,10 +48,11 @@ def get_police_target(targets):
 def show_police_answer(player_data, target):
     ''' UI alerts whether the person interrogated by the police is an assassin or
     not. '''
-    if player_data[target].is_assn():
-        ui.show_info('The person you queried is an assassin.\n')
-    else:
-        ui.show_info('The person you queried is NOT an assassin.\n')
+    if target != "NONE":
+        if player_data[target].is_assn():
+            ui.show_info('The person you queried is an assassin.\n')
+        else:
+            ui.show_info('The person you queried is NOT an assassin.\n')
 
 
 def get_mutilator_target(targets):

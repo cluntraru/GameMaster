@@ -18,8 +18,24 @@ def get_names(logger, player_cnt):
     return rlio.get_names(player_cnt)
 
 
-def show_scoreboard(logger, layer_cnt, player_names, round, scoreboard, diffs):
+def get_bid(logger, name, possible_bids):
+    ''' Prompts a player for their bid. '''
     if logger.is_debug_mode():
-        dbgio.show_scoreboard(player_cnt, player_names, round, scoreboard, diffs)
+        return dbgio.get_bid(name, possible_bids)
+
+    return rlio.get_bid()
+
+
+def get_result(logger, name, possible_results):
+    if logger.is_debug_mode():
+        return dbgio.get_result(name, possible_results)
+
+    return rlio.get_result()
+
+
+def show_scoreboard(logger, player_cnt, player_names, round, scoreboard, diffs):
+    ''' Shows players the scoreboard.  '''
+    if logger.is_debug_mode():
+        dbgio.show_scoreboard(logger, player_cnt, player_names, round, scoreboard, diffs)
     else:
-        rlio.show_scoreboard(player_cnt, player_names, round, scoreboard, diffs)
+        rlio.show_scoreboard(logger, player_cnt, player_names, round, scoreboard, diffs)

@@ -8,29 +8,29 @@ class GameState:
 
     def __init__(self, logger, player_cnt, player_names):
         ''' Creates initial game state. '''
-        LOGGER = logger
+        GameState.LOGGER = logger
         if player_cnt < 3 or player_cnt > 6:
             logger.log_debug('There can only be 4, 5 or 6 players.')
             sys.exit()
 
-        self.names = player_names
-        self.player_cnt = player_cnt
-        self.dealer = random.randint(0, player_cnt - 1)
-        self.card_cnt = 1
-        self.round = 0
+        self._names = player_names
+        self._player_cnt = player_cnt
+        self._dealer = random.randint(0, player_cnt - 1)
+        self._card_cnt = 1
+        self._round = 0
+        self._round_cnt = 3 * player_cnt + 12
 
-        round_cnt = 3 * player_cnt + 12
         # Blank matrix
-        self.bid_history = [[0 for i in range(player_cnt)] for j in range(round_cnt)]
-        self.result_history = self.bid_history
-        self.scoreboard = self.bid_history
-        self.point_diff = self.bid_history
+        self._bid_history = [[0 for i in range(player_cnt)] for j in range(self._round_cnt)]
+        self._result_history = [[0 for i in range(player_cnt)] for j in range(self._round_cnt)]
+        self._scoreboard = [[0 for i in range(player_cnt)] for j in range(self._round_cnt)]
+        self._point_diff = [[0 for i in range(player_cnt)] for j in range(self._round_cnt)]
 
 
     def _get_player_from_ord(self, player_ord):
         ''' Returns the actual index of the n-th player in the current round.
         '''
-        return (self.dealer + player_ord) % self.player_cnt
+        return (self._dealer + player_ord) % self._player_cnt
 
 
     def _prev_score(self, round, player_name):
@@ -38,60 +38,85 @@ class GameState:
         if (round == 0):
             return 0
 
-        return self.scoreboard[round - 1][player_name]
+        return self._scoreboard[round - 1][player_name]
 
 
-    def _update_scoreboard(self, round):
+    def _update_scoreboard(self, curr_round):
         ''' Updates scoreboard information after a round was played. '''
-        for player_idx in range(self.player_cnt):
+        for player_idx in range(self._player_cnt):
             # Player made their contract
-            bid = self.bid_history[round][player_idx]
-            result = self.result_history[round][player_idx]
+            # print(self._bid_history, curr_round, player_idx)
+            bid = self._bid_history[curr_round][player_idx]
+            result = self._result_history[curr_round][player_idx]
             if bid == result:
-                point_diff[round][player_idx] = 5 + bid
+                point_diff = 5 + bid
             else:
-                point_diff[round][player_idx] = - abs(bid - result)
+                point_diff = - abs(bid - result)
             
-            self.scoreboard[round][player_idx] = self._prev_score(round, player_idx) + point_diff
+            self._point_diff[curr_round][player_idx] = point_diff
+            self._scoreboard[curr_round][player_idx] = self._prev_score(curr_round, player_idx) + point_diff
 
 
-    def play_bids(self):
+    def _play_bids(self):
         ''' Gets bids from input. '''
         bid_sum = 0
-        for player_ord in range(1, player_cnt):
+        possible_bids = [i for i in range(0, self._card_cnt + 1)]
+        for player_ord in range(1, self._player_cnt):
             player_idx = self._get_player_from_ord(player_ord)
-            bid_history[self.round][player_idx] = io.get_bid(self.names[player_idx], bids)
-            bid_sum += bid[player_idx]
+            curr_bid = io.get_bid(GameState.LOGGER, self._names[player_idx], possible_bids)
+            self._bid_history[self._round][player_idx] = curr_bid
+            bid_sum += curr_bid
 
         # Dealer's bid is constrained by other bids
-        dealer_bids = []
-        for j in range(0, self.card_cnt + 1):
-            if bid_sum + j != self.card_cnt:
-                dealer_bids.append(j)
+        possible_dealer_bids = []
+        for j in range(0, self._card_cnt + 1):
+            if bid_sum + j != self._card_cnt:
+                possible_dealer_bids.append(j)
 
-        bid_history[self.round][self.dealer] = io.get_bid(self.names[self.dealer], dealer_bids)
+        dealer_bid = io.get_bid(GameState.LOGGER, self._names[self._dealer], possible_dealer_bids)
+        self._bid_history[self._round][self._dealer] = dealer_bid
 
 
-    def get_results(self):
-        # logger.log_info('Enter results!')
-        possible_results = [i for i in range(0, self.card_cnt + 1)]
-        for player_ord in range(0, player_cnt + 1):
+    def _play_results(self):
+        possible_results = [i for i in range(0, self._card_cnt + 1)]
+        for player_ord in range(1, self._player_cnt):
             player_idx = self._get_player_from_ord(player_ord)
-            self.result_history[player_idx] = io.get_result(player_names[player_idx], possible_results)
+            player_result = io.get_result(GameState.LOGGER, self._names[player_idx], possible_results)
+            self._result_history[self._round][player_idx] = player_result
+
+        dealer_result = io.get_result(GameState.LOGGER, self._names[self._dealer],  possible_results)
+        self._result_history[self._round][self._dealer] = dealer_result
 
 
-    def advance_round(self, player_bids, player_results):
+    def _advance_round(self):
         ''' Updates scoreboard, cards in the round and round counter. '''
-        self.dealer =  (self.dealer + 1) % player_cnt
+        self._dealer =  (self._dealer + 1) % self._player_cnt
 
         # 0 1 ...  p-1         p+5         2*p+5       2*p+11
         # 1 1 ... [1 2 3 4 5 6 7] 8 8 ... [8 7 6 5 4 3 2] 1 1 ... 1
-        if self.round >= player_cnt - 1 and self.round <= player_cnt + 5:
-            self.card_cnt += 1
-        elif self.round >= 2 * player_cnt + 5 and self.round <= 2 * p + 11:
-            self.card_cnt -= 1
+        if self._round >= self._player_cnt - 1 and self._round <= self._player_cnt + 5:
+            self._card_cnt += 1
+        elif self._round >= 2 * self._player_cnt + 5 and self._round <= 2 * p + 11:
+            self._card_cnt -= 1
 
-        self._update_scoreboard()
-        io.show_scoreboard(self.player_cnt, self.player_names, self.round, self.scoreboard)
+        self._update_scoreboard(self._round)
+        io.show_scoreboard(GameState.LOGGER, self._player_cnt, self._names, self._round, self._scoreboard, self._point_diff)
 
-        self.round += 1
+        self._round += 1
+
+
+    def _play_round(self):
+        GameState.LOGGER.log_info('Round ' + str(self._round + 1))
+        GameState.LOGGER.log_info('Dealer: ' + self._names[self._dealer])
+        self._play_bids()
+        self._play_results()
+        self._advance_round()
+
+
+    def _game_over(self):
+        return self._round == self._round_cnt
+
+
+    def start_game(self):
+        while not self._game_over():
+            self._play_round()

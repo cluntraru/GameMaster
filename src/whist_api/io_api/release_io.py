@@ -10,5 +10,9 @@ def get_bid(logger, name, possible_bids):
     pass
 
 
+def get_result(logger, name, possible_results):
+    pass
+
+
 def show_scoreboard(logger, player_cnt, player_names, round, scoreboard, diffs):
     pass

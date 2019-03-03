@@ -1,6 +1,7 @@
+''' Entry point to GameMaster app. '''
+from argparse import ArgumentParser
 import mafia_api.mafia as mafia
 import whist_api.whist as whist
-from argparse import ArgumentParser
 
 if __name__ == '__main__':
     parser = ArgumentParser()

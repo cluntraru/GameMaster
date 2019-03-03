@@ -10,12 +10,13 @@ from mafia_api.player_api.player import Player
 from logger import Logger
 
 class MafiaLogger(Logger):
+    ''' Implementation of logger class for the Mafia game. '''
     SPEAKER = None
 
     def __init__(self, debug_mode, speak_mode):
         super().__init__(debug_mode, speak_mode)
         if sys.platform == 'win32' and Logger.SPEAK_MODE:
-            SPEAKER = win32com.client.Dispatch("SAPI.SpVoice")
+            MafiaLogger.SPEAKER = win32com.client.Dispatch("SAPI.SpVoice")
 
 
     def speak(self, text):
@@ -25,7 +26,7 @@ class MafiaLogger(Logger):
         if sys.platform == 'darwin':
             os.system('say ' + '"' + text + '"')
         elif sys.platform == 'win32':
-            SPEAKER.Speak(text)
+            MafiaLogger.SPEAKER.Speak(text)
 
 
     def output(self, text):

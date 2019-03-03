@@ -1,4 +1,6 @@
+''' Logger class. '''
 class Logger:
+    ''' Logger base class implementation. '''
     DEBUG_MODE = None
     SPEAK_MODE = None
 
@@ -8,10 +10,12 @@ class Logger:
 
 
     def log_info(self, text):
+        ''' Prints to console. '''
         print(text)
 
 
     def log_debug(self, text):
+        ''' Logs to console only if debug mode is enabled. '''
         if Logger.DEBUG_MODE:
             print(text)
 

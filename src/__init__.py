@@ -1,1 +1,2 @@
+''' Package initialization. '''
 import main

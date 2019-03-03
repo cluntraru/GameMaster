@@ -82,15 +82,28 @@ def get_emails_form(logger, players_number):
     labels = []
     emails_and_names = []
     for i in range(0, players_number):
-        labels.append(Label(curr_window, text="Player " + str(i + 1) + " name:", width=20, font=("bold", 10)))
-        labels[i*2].place(x=LEFT_SHIFT*4*floor(i/MAX_ENTRIES), y=130+30*(i%MAX_ENTRIES))
-        entries.append(Entry(curr_window))
-        entries[i*2].place(x=LEFT_SHIFT*(4*(floor(i/MAX_ENTRIES))+1), y=130+30*(i % MAX_ENTRIES))
+        labels.append(Label(curr_window, text="Player " + str(i + 1) +\
+                            " name:", width=20, font=("bold", 10)))
 
-        labels.append(Label(curr_window, text="Player " + str(i + 1) + " email:", width=20, font=("bold", 10)))
-        labels[i * 2 + 1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 2), y=130 + 30 * (i % MAX_ENTRIES))
+        labels[i*2].place(x=LEFT_SHIFT*4*floor(i/MAX_ENTRIES),\
+                          y=130+30*(i%MAX_ENTRIES))
+
         entries.append(Entry(curr_window))
-        entries[i * 2 +1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 3), y=130 + 30 * (i % MAX_ENTRIES))
+
+        entries[i*2].place(x=LEFT_SHIFT*(4*(floor(i/MAX_ENTRIES))+1),\
+                           y=130+30*(i % MAX_ENTRIES))
+
+        labels.append(Label(curr_window, text="Player " + str(i + 1) +\
+                            " email:", width=20, font=("bold", 10)))
+
+        labels[i * 2 + 1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 2),\
+                                y=130 + 30 * (i % MAX_ENTRIES))
+
+        entries.append(Entry(curr_window))
+
+        entries[i * 2 +1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 3),\
+                                y=130 + 30 * (i % MAX_ENTRIES))
+
     logger.log_debug("Created email fields")
     def check_different_names():
         different_names = True
@@ -129,7 +142,7 @@ def get_emails_form(logger, players_number):
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.place(x=80+LEFT_SHIFT*floor(players_number/MAX_ENTRIES), y=130+30*(MAX_ENTRIES+1))
     WindowSingleton.use_and_destroy_instance()
-    if not emails_and_names == 0:
+    if emails_and_names != 0:
         logger.log_debug("Window for emails and names was closed\n")
     return emails_and_names
 

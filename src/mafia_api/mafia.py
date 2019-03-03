@@ -67,7 +67,8 @@ def assign_roles():
 
     random.shuffle(role_list)
 
-    emails, msgs = io.get_names_emails(logger, role_list, roles_cnt[pl.Player.PLAYER_IDX], player_data)
+    emails, msgs = io.get_names_emails(logger, role_list,\
+                   roles_cnt[pl.Player.PLAYER_IDX], player_data)
 
     for i in range(roles_cnt[pl.Player.PLAYER_IDX]):
         gm_email.send_email(logger, emails[i], msgs[i])
@@ -226,7 +227,8 @@ def mutilator_night(mutilator_turn):
     '''' Simulates the mutilators' night phase. '''
     logger.output('The mutilators wake up.')
     if mutilator_turn:
-        mutilated, mutilated_area = io.get_mutilator_target(logger, player_data, get_mutilator_targets())
+        mutilated, mutilated_area = io.get_mutilator_target(logger,\
+                                    player_data, get_mutilator_targets())
     else:
         mutilated = None
         mutilated_area = None

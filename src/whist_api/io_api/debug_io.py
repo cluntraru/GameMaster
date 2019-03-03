@@ -1,7 +1,7 @@
 ''' Module for handling I/O in debug mode. '''
-def _to_int(str):
+def _to_int(curr_str):
     try:
-        return int(str)
+        return int(curr_str)
     except ValueError:
         return -1
 
@@ -43,8 +43,10 @@ def get_result(name, possible_results):
     return result
 
 
-def show_scoreboard(logger, player_cnt, player_names, round, scoreboard, diffs):
+def show_scoreboard(logger, player_cnt, player_names, target_round, scoreboard,\
+                    diffs):
+
     ''' Prints scoreboard in console. '''
     logger.log_info('Scoreboard')
     logger.log_info(player_names)
-    logger.log_info(scoreboard[round])
+    logger.log_info(scoreboard[target_round])

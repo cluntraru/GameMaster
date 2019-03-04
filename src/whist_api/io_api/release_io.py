@@ -14,5 +14,5 @@ def get_result(name, possible_results):
     pass
 
 
-def show_scoreboard(player_cnt, player_names, round, scoreboard, diffs):
+def show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs):
     pass

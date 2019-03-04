@@ -1,6 +1,13 @@
 ''' Facade for handling input and output. '''
 import sys
 import os
+
+try:
+    import win32com.client
+except ModuleNotFoundError:
+    pass
+
+
 import mafia_api.io_api.release_io as rlio
 import mafia_api.io_api.debug_io as dbgio
 from mafia_api.player_api.player import Player
@@ -82,9 +89,9 @@ def _speak(text):
         os.system('say ' + '"' + text + '"')
     elif sys.platform == 'win32':
         global SPEAKER
-        if SPEAKER == None:
+        if SPEAKER is None:
             SPEAKER = win32com.client.Dispatch("SAPI.SpVoice")
-        
+
         SPEAKER.Speak(text)
 
 

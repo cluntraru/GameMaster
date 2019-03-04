@@ -24,7 +24,7 @@ def get_bid(name, possible_bids):
     if logger.is_debug_mode():
         return dbgio.get_bid(name, possible_bids)
 
-    return rlio.get_bid()
+    return rlio.get_bid(name, possible_bids)
 
 
 def get_result(name, possible_results):
@@ -32,7 +32,7 @@ def get_result(name, possible_results):
     if logger.is_debug_mode():
         return dbgio.get_result(name, possible_results)
 
-    return rlio.get_result()
+    return rlio.get_result(name, possible_results)
 
 
 def show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs):

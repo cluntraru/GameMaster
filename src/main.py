@@ -17,8 +17,8 @@ if __name__ == '__main__':
     logger.set_debug_mode(ARGS.debug)
     logger.set_speak_mode(not ARGS.textonly)
 
-    game = input('Do you want to play whist or mafia? ')
-    if game == 'mafia':
+    GAME = input('Do you want to play whist or mafia? ')
+    if GAME == 'mafia':
         mafia.start()
-    elif game == 'whist':
+    elif GAME == 'whist':
         whist.start()

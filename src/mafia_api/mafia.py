@@ -1,10 +1,8 @@
 ''' Implementation of the storyteller in the popular game 'Mafia' '''
-
 import random
 import math
 import sys
 import time
-from argparse import ArgumentParser
 
 import mafia_api.email_api.gm_email as gm_email
 import mafia_api.io_api.facade_io as io
@@ -351,7 +349,7 @@ def log_results():
 def start():
     ''' Starts a game of Mafia. '''
     if assign_roles():
-            sys.exit()
+        sys.exit()
 
     # Log all roles in debug mode
     for player_name in player_data:
@@ -359,18 +357,3 @@ def start():
 
     play_game()
     log_results()
-
-
-if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument('-x', '--textonly', action='store_true',
-                        help='Do not use voice output')
-
-    parser.add_argument('-d', '--debug', action='store_true',
-                        help='All I/O comes from console')
-
-    ARGS = parser.parse_args()
-    logger.set_debug_mode(args.debug)
-    logger.set_speak_mode(not args.textonly)
-
-    start()

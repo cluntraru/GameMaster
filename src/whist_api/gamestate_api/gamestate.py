@@ -111,7 +111,7 @@ class GameState:
 
     def _play_round(self):
         ''' Plays the next round in the game. '''
-        logger.log_info('Round ' + str(self._round + 1))
+        logger.log_info('\nRound ' + str(self._round + 1))
         logger.log_info('Dealer: ' + self._names[self._dealer])
         self._play_bids()
         self._play_results()

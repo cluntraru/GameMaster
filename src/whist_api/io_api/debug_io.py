@@ -47,6 +47,9 @@ def get_result(name, possible_results):
 
 def show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs):
     ''' Prints scoreboard in console. '''
-    logger.log_info('Scoreboard')
+    logger.log_info('\nScoreboard - Round ' + str(target_round + 1))
     logger.log_info(player_names)
-    logger.log_info(scoreboard[target_round])
+
+    if target_round > 0:
+        logger.log_info('Previous: ' + str(scoreboard[target_round - 1]))
+    logger.log_info('New: ' + str(scoreboard[target_round]))

@@ -2,14 +2,12 @@
 import random
 import sys
 import whist_api.io_api.facade_io as io
+import logger
 
 class GameState:
     ''' GameState class. Multiple instances can be created for testing. '''
-    LOGGER = None
-
-    def __init__(self, logger, player_cnt, player_names):
+    def __init__(self, player_cnt, player_names):
         ''' Creates initial game state. '''
-        GameState.LOGGER = logger
         if player_cnt < 3 or player_cnt > 6:
             logger.log_debug('There can only be 4, 5 or 6 players.')
             sys.exit()
@@ -66,7 +64,7 @@ class GameState:
         possible_bids = [i for i in range(0, self._card_cnt + 1)]
         for player_ord in range(1, self._player_cnt):
             player_idx = self._get_player_from_ord(player_ord)
-            curr_bid = io.get_bid(GameState.LOGGER, self._names[player_idx], possible_bids)
+            curr_bid = io.get_bid(self._names[player_idx], possible_bids)
             self._bid_history[self._round][player_idx] = curr_bid
             bid_sum += curr_bid
 
@@ -76,7 +74,7 @@ class GameState:
             if bid_sum + j != self._card_cnt:
                 possible_dealer_bids.append(j)
 
-        dealer_bid = io.get_bid(GameState.LOGGER, self._names[self._dealer], possible_dealer_bids)
+        dealer_bid = io.get_bid(self._names[self._dealer], possible_dealer_bids)
         self._bid_history[self._round][self._dealer] = dealer_bid
 
 
@@ -84,13 +82,11 @@ class GameState:
         possible_results = [i for i in range(0, self._card_cnt + 1)]
         for player_ord in range(1, self._player_cnt):
             player_idx = self._get_player_from_ord(player_ord)
-            player_result = io.get_result(GameState.LOGGER,\
-                                          self._names[player_idx], possible_results)
+            player_result = io.get_result(self._names[player_idx], possible_results)
 
             self._result_history[self._round][player_idx] = player_result
 
-        dealer_result = io.get_result(GameState.LOGGER, self._names[self._dealer],\
-                                      possible_results)
+        dealer_result = io.get_result(self._names[self._dealer], possible_results)
 
         self._result_history[self._round][self._dealer] = dealer_result
 
@@ -107,16 +103,15 @@ class GameState:
             self._card_cnt -= 1
 
         self._update_scoreboard(self._round)
-        io.show_scoreboard(GameState.LOGGER, self._player_cnt, self._names,\
-                           self._round, self._scoreboard, self._point_diff)
+        io.show_scoreboard(self._player_cnt, self._names, self._round, self._scoreboard, self._point_diff)
 
         self._round += 1
 
 
     def _play_round(self):
         ''' Plays the next round in the game. '''
-        GameState.LOGGER.log_info('Round ' + str(self._round + 1))
-        GameState.LOGGER.log_info('Dealer: ' + self._names[self._dealer])
+        logger.log_info('Round ' + str(self._round + 1))
+        logger.log_info('Dealer: ' + self._names[self._dealer])
         self._play_bids()
         self._play_results()
         self._advance_round()

@@ -1,6 +1,6 @@
 ''' Functions that ask for input from console. '''
 import random
-# from mafia.io_api.mafia_logger import MafiaLogger as Logger
+import logger
 from mafia_api.player_api.player import Player
 import mafia_api.email_api.gm_email as email
 
@@ -61,8 +61,10 @@ def get_police_target(player_data):
     while not _valid_target(police_query, player_data):
         police_query = input('Invalid target. Person to query: ')
 
+    return police_query
 
-def show_police_answer(logger, player_data, target):
+
+def show_police_answer(player_data, target):
     ''' Console alerts whether the person interrogated by the police is an
     assassin or not. '''
     if player_data[target].is_assn():

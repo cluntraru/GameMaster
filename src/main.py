@@ -2,6 +2,7 @@
 from argparse import ArgumentParser
 import mafia_api.mafia as mafia
 import whist_api.whist as whist
+import logger
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -12,10 +13,12 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--debug', action='store_true',
                         help='All I/O comes from console')
 
-    args = parser.parse_args()
+    ARGS = parser.parse_args()
+    logger.set_debug_mode(ARGS.debug)
+    logger.set_speak_mode(not ARGS.textonly)
 
-    game = input('Do you want to play whist or mafia?')
+    game = input('Do you want to play whist or mafia? ')
     if game == 'mafia':
-        mafia.start(args.debug, not args.textonly)
+        mafia.start()
     elif game == 'whist':
-        whist.start(args.debug, not args.textonly)
+        whist.start()

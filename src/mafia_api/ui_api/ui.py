@@ -1,7 +1,7 @@
 '''Ui of mafia storyteller'''
 from tkinter import Frame, Tk, Button, Text, LEFT, INSERT, Label, Entry
 from math import floor
-# from mafia_api.io_api.mafia_logger import MafiaLogger as Logger
+import logger
 
 COLORS = ["red", "green", "blue", "brown", "orange", "purple"]
 NOBODY = "NONE"
@@ -41,7 +41,7 @@ mutilated_person = NOBODY
 mutilation_place = NOBODY
 field_number = "-1"
 
-def get_players_number(logger):
+def get_players_number():
     '''gets players number'''
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
@@ -71,7 +71,7 @@ def get_players_number(logger):
     return int(field_number)
 
 
-def get_emails_form(logger, players_number):
+def get_emails_form(players_number):
     '''creates and shows email form'''
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
@@ -147,7 +147,7 @@ def get_emails_form(logger, players_number):
     return emails_and_names
 
 
-def show_info(logger, curr_info):
+def show_info(curr_info):
     '''shows info, mostly for cop'''
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("Night Report For Cop")
@@ -163,7 +163,7 @@ def show_info(logger, curr_info):
     WindowSingleton.use_and_destroy_instance()
     logger.log_debug("Info window closed")
 
-def create_voting_screen(logger, player_window, player_names, vote_function):
+def create_voting_screen(player_window, player_names, vote_function):
     '''screen populating function'''
     top_frame = Frame(player_window)
     top_frame.pack()
@@ -185,7 +185,7 @@ def create_voting_screen(logger, player_window, player_names, vote_function):
     logger.log_debug("Voting screen closed")
 
 
-def day_vote(logger, players_can_vote, votable_players):
+def day_vote(players_can_vote, votable_players):
     '''day vote'''
     player_votes = {}
     for player_name in votable_players:
@@ -202,7 +202,7 @@ def day_vote(logger, players_can_vote, votable_players):
                 player_window.destroy()
             return callback
 
-        create_voting_screen(logger, curr_window, votable_players, day_vote_function)
+        create_voting_screen(curr_window, votable_players, day_vote_function)
 
     hanged_player = NOBODY
     for player_name in votable_players:
@@ -212,7 +212,7 @@ def day_vote(logger, players_can_vote, votable_players):
     return hanged_player
 
 
-def night_assassin_vote(logger, town_names):
+def night_assassin_vote(town_names):
     '''assassin vote'''
     global assassinated_person
     assassinated_person = NOBODY
@@ -229,13 +229,13 @@ def night_assassin_vote(logger, town_names):
 
         return callback
 
-    create_voting_screen(logger, curr_window, town_names, assassin_vote_function)
+    create_voting_screen(curr_window, town_names, assassin_vote_function)
 
     logger.log_debug("Night victim was " + assassinated_person)
     return assassinated_person
 
 
-def night_cop_vote(logger, player_names):
+def night_cop_vote(player_names):
     '''cop vote'''
     global checked_person
     checked_person = NOBODY
@@ -252,13 +252,13 @@ def night_cop_vote(logger, player_names):
 
         return callback
 
-    create_voting_screen(logger, curr_window, player_names, cop_vote_function)
+    create_voting_screen(curr_window, player_names, cop_vote_function)
 
     logger.log_debug("Cop checked " + checked_person)
     return checked_person
 
 
-def night_doctor_vote(logger, player_names):
+def night_doctor_vote(player_names):
     '''doctor vote'''
     global saved_person
     saved_person = NOBODY
@@ -275,13 +275,13 @@ def night_doctor_vote(logger, player_names):
 
         return callback
 
-    create_voting_screen(logger, curr_window, player_names, doctor_vote_function)
+    create_voting_screen(curr_window, player_names, doctor_vote_function)
 
     logger.log_debug("Doctor saved " + saved_person)
     return saved_person
 
 
-def night_mutilator_vote(logger, player_names):
+def night_mutilator_vote(player_names):
     '''mutilator vote'''
     global mutilated_person, mutilation_place
     mutilated_person = NOBODY
@@ -306,12 +306,12 @@ def night_mutilator_vote(logger, player_names):
 
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-    create_voting_screen(logger, curr_window, player_names, mutilator_vote_function)
+    create_voting_screen(curr_window, player_names, mutilator_vote_function)
 
     if mutilated_person != NOBODY:
         curr_window = WindowSingleton.get_instance().window
         curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-        create_voting_screen(logger, curr_window, ["Hand", "Mouth"], mutilator_place_function)
+        create_voting_screen(curr_window, ["Hand", "Mouth"], mutilator_place_function)
 
     logger.log_debug("Mutilator targeted " + mutilated_person)
     return (mutilated_person, mutilation_place)

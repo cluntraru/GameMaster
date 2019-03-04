@@ -1,18 +1,18 @@
-def get_player_cnt(logger):
+def get_player_cnt():
     pass
 
 
-def get_names(logger, player_cnt):
+def get_names(player_cnt):
     pass
 
 
-def get_bid(logger, name, possible_bids):
+def get_bid(name, possible_bids):
     pass
 
 
-def get_result(logger, name, possible_results):
+def get_result(name, possible_results):
     pass
 
 
-def show_scoreboard(logger, player_cnt, player_names, round, scoreboard, diffs):
+def show_scoreboard(player_cnt, player_names, round, scoreboard, diffs):
     pass

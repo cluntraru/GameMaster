@@ -1,6 +1,6 @@
 ''' E-mail functionality '''
 import smtplib
-# from mafia.io_api.mafia_logger import MafiaLogger as Logger
+import logger
 
 def get_msg_from_name(name, player_data):
     ''' Returns message to email to player containing role. '''
@@ -8,7 +8,7 @@ def get_msg_from_name(name, player_data):
            player_data[name].get_role_name() + '.'
 
 
-def send_email(logger, to_email, message):
+def send_email(to_email, message):
     ''' Sends an email with a certain message. '''
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()

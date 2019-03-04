@@ -2,14 +2,13 @@
 from argparse import ArgumentParser
 from whist_api.gamestate_api.gamestate import GameState
 import whist_api.io_api.facade_io as io
-from whist_api.io_api.whist_logger import WhistLogger
+import logger
 
-def start(debug_mode, speak_mode):
+def start():
     ''' Starts a game of Whist. '''
-    logger = WhistLogger(debug_mode, speak_mode)
-    player_cnt = io.get_player_cnt(logger)
-    player_names = io.get_names(logger, player_cnt)
-    gs = GameState(logger, player_cnt, player_names)
+    player_cnt = io.get_player_cnt()
+    player_names = io.get_names(player_cnt)
+    gs = GameState(player_cnt, player_names)
     gs.start_game()
 
 
@@ -22,5 +21,9 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--debug', action='store_true',
                         help='All I/O comes from console')
 
-    args = parser.parse_args()
-    start(args.debug, not args.textonly)
+    ARGS = parser.parse_args()
+
+    logger.set_debug_mode(ARGS.debug)
+    logger.set_speak_mode(not ARGS.textonly)
+
+    start()

@@ -2,6 +2,8 @@
 from tkinter import Frame, Tk, Button, Text, LEFT, INSERT, Label, Entry
 from math import floor
 import logger
+import sys
+from threading import Thread
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
@@ -9,6 +11,23 @@ MAX_ENTRIES = 10
 LEFT_SHIFT = 160
 FIELD_SPACE = 40
 TITLE_SPACE = 200
+
+
+assassinated_person = NOBODY
+checked_person = NOBODY
+saved_person = NOBODY
+mutilated_person = NOBODY
+mutilation_place = NOBODY
+field_number = "-1"
+just_voted = False
+window_open = False
+
+
+def delete_children(window):
+    _list = window.winfo_children()
+
+    for item in _list:
+        item.destroy()
 
 
 class WindowSingleton:
@@ -21,27 +40,43 @@ class WindowSingleton:
             WindowSingleton()
         return WindowSingleton.__instance
     @staticmethod
-    def use_and_destroy_instance():
+    def reset_instance():
         """Static use and destroy method"""
-        WindowSingleton.__instance.window.mainloop()
-        WindowSingleton.__instance = None
+        window = WindowSingleton.__instance.window
+        delete_children(window)
+
 
     def __init__(self):
         """ Virtually private constructor. """
         if WindowSingleton.__instance is not None:
-            raise Exception("This class is a singleton!")
+            pass
         else:
             self.window = Tk()
             WindowSingleton.__instance = self
 
 
 
-assassinated_person = NOBODY
-checked_person = NOBODY
-saved_person = NOBODY
-mutilated_person = NOBODY
-mutilation_place = NOBODY
-field_number = "-1"
+def window_thread_start():
+    """Creates the window(in a separate thread)"""
+    WindowSingleton()
+    global window_open
+    window_open = True
+    WindowSingleton.get_instance().window.mainloop()
+    window_open = False
+    print("Exiting")
+    sys.exit()
+
+
+window_thread = Thread(target=window_thread_start)
+window_thread.start()
+
+print("YEEE BOI")
+
+
+
+
+
+
 
 def get_players_number():
     '''gets players number'''
@@ -70,21 +105,24 @@ def get_players_number():
     def get_val():
         """gets number from field"""
         global field_number
+
         field_number = number_entry.get()
         if int(field_number) <= 4:
             form_text_label['text'] = "Too few players"
         elif int(field_number) > 20:
             form_text_label['text'] = "Too many players"
-        else:
-            curr_window.destroy()
+
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
-    WindowSingleton.use_and_destroy_instance()
+
     if (int(field_number)) == -1:
         logger.log_debug("Window for getting players number closed\n")
     else:
         logger.log_debug("Number of player: " + field_number)
+    while (not (4 < int(field_number) <= 20 ) and window_open):
+        pass
+    WindowSingleton.reset_instance()
     return int(field_number)
 
 
@@ -134,6 +172,7 @@ def get_emails_form(players_number):
     def check_different_names():
         different_names = True
         nonlocal emails_and_names
+        players_number = len(emails_and_names)
         for i in range(0, players_number):
             for j in range(0, players_number):
                 if i != j:
@@ -144,6 +183,9 @@ def get_emails_form(players_number):
     def check_empty_names():
         nonempty_names = True
         nonlocal emails_and_names
+        players_number = len(emails_and_names)
+        if(len(emails_and_names) == 0):
+            return False
         for i in range(0, players_number):
             if emails_and_names[i][0] == "":
                 nonempty_names = False
@@ -159,7 +201,7 @@ def get_emails_form(players_number):
         nonempty_names = check_empty_names()
 
         if different_names and nonempty_names:
-            curr_window.destroy()
+            pass
         elif nonempty_names is False:
             text_label['text'] = "One or more names are empty"
         elif different_names is False:
@@ -168,9 +210,11 @@ def get_emails_form(players_number):
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.configure(background="red", foreground="white")
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
-    WindowSingleton.use_and_destroy_instance()
-    if emails_and_names != 0:
-        logger.log_debug("Window for emails and names was closed\n")
+
+    while (not (check_empty_names() and check_different_names())) and window_open:
+        pass
+        #logger.log_debug("Window for emails and names was closed\n")
+    WindowSingleton.reset_instance()
     return emails_and_names
 
 
@@ -178,22 +222,24 @@ def show_info(curr_info):
     '''shows info, mostly for cop'''
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("Night Report For Cop")
-    def destroy_window():
-        '''destroys window'''
-        curr_window.destroy()
-
     screen_info = Text(curr_window)
     screen_info.insert(INSERT, curr_info)
     screen_info.pack()
+    done_was_clicked = False
+    def done_click():
+        nonlocal done_was_clicked
+        done_was_clicked = True
+        WindowSingleton.reset_instance()
     done_button = Button(curr_window, fg="RED", height=2, width=20,
-                         text="Done", command=destroy_window)
+                         text="Done", command=done_click)
     done_button.pack()
-    WindowSingleton.use_and_destroy_instance()
+    while (not done_was_clicked) and window_open:
+        pass
     logger.log_debug("Info window closed")
 
 def create_voting_screen(player_window, player_names, vote_function, player_message="Time to vote"):
     '''screen populating function'''
-
+    player_window = WindowSingleton.get_instance().window
     background_color = "black"
     player_window.configure(background=background_color)
     player_window.title(player_message)
@@ -226,9 +272,12 @@ def create_voting_screen(player_window, player_names, vote_function, player_mess
                              command=vote_function(player_window, player_name))
         vote_button.configure(font=("Courier", 10))
         vote_button.pack(side=LEFT)
-
-    WindowSingleton.use_and_destroy_instance()  # make sure buttons are constantly displayed
-    logger.log_debug("Voting screen closed")
+    global just_voted
+    just_voted = False
+    while (not just_voted) and window_open:
+        pass
+    WindowSingleton.reset_instance()
+    #logger.log_debug("Voting screen closed")
 
 
 def day_vote(players_can_vote, votable_players):
@@ -245,7 +294,8 @@ def day_vote(players_can_vote, votable_players):
         def day_vote_function(player_window, player_name):
             def callback():
                 player_votes[player_name] += 1
-                player_window.destroy()
+                global just_voted
+                just_voted = True
             return callback
 
         create_voting_screen(curr_window, votable_players, day_vote_function,
@@ -253,7 +303,7 @@ def day_vote(players_can_vote, votable_players):
 
     hanged_player = NOBODY
     for player_name in votable_players:
-        if player_votes[player_name] > len(votable_players) / 2:
+        if player_votes[player_name] > len(players_can_vote) / 2:
             hanged_player = player_name
     logger.log_debug("The day victim was: " + hanged_player)
     return hanged_player
@@ -272,7 +322,8 @@ def night_assassin_vote(town_names):
             '''callback'''
             global assassinated_person
             assassinated_person = player_name
-            player_window.destroy()
+            global just_voted
+            just_voted = True
 
         return callback
 
@@ -296,7 +347,8 @@ def night_cop_vote(player_names):
             '''callback'''
             global checked_person
             checked_person = player_name
-            player_window.destroy()
+            global just_voted
+            just_voted = True
 
         return callback
 
@@ -320,7 +372,8 @@ def night_doctor_vote(player_names):
             '''callback'''
             global saved_person
             saved_person = player_name
-            player_window.destroy()
+            global just_voted
+            just_voted = True
 
         return callback
 
@@ -342,7 +395,8 @@ def night_mutilator_vote(player_names):
             '''callback'''
             global mutilated_person
             mutilated_person = player_name
-            player_window.destroy()
+            global just_voted
+            just_voted = True
 
         return callback
 
@@ -350,7 +404,8 @@ def night_mutilator_vote(player_names):
         def callback():
             global mutilation_place
             mutilation_place = place_name[0]
-            player_window.destroy()
+            global just_voted
+            just_voted = True
 
         return callback
 

@@ -3,11 +3,13 @@ from tkinter import Frame, Tk, Button, Text, LEFT, INSERT, Label, Entry
 from math import floor
 import logger
 
-COLORS = ["red", "green", "blue", "brown", "orange", "purple"]
+COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
 MAX_ENTRIES = 10
 LEFT_SHIFT = 160
-UP_SHIFT = 40
+FIELD_SPACE = 40
+TITLE_SPACE = 200
+
 
 class WindowSingleton:
     '''Singleton for window'''
@@ -20,7 +22,7 @@ class WindowSingleton:
         return WindowSingleton.__instance
     @staticmethod
     def use_and_destroy_instance():
-        '''Static use and destroy method'''
+        """Static use and destroy method"""
         WindowSingleton.__instance.window.mainloop()
         WindowSingleton.__instance = None
 
@@ -43,26 +45,41 @@ field_number = "-1"
 
 def get_players_number():
     '''gets players number'''
+
+    background_color = "#A3D9FF"
+    foreground_color = "orange"
+
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
     curr_window.title("Players number")
+    curr_window.configure(background=background_color)
 
-    text_label = Label(curr_window, text="Insert number of players:", width=20, font=("bold", 10))
-    text_label.place(x=10, y=UP_SHIFT)
+    title_text_label = Label(curr_window, text="Welcome to Mafia", width=20, font=("bold", 30))
+    #title_text_label.configure(anchor="n")
+    title_text_label.place(x=400, y=30, anchor="w")
+    title_text_label.configure(background=background_color, foreground=foreground_color)
+
+    form_text_label = Label(curr_window, text="Insert number of players:",
+                            width=20, font=("bold", 10))
+    form_text_label.place(x=10, y=TITLE_SPACE)
+    form_text_label.configure(background=background_color, foreground=foreground_color)
+
     number_entry = Entry(curr_window)
-    number_entry.place(x=20, y=UP_SHIFT * 2)
+    number_entry.place(x=20, width=20, y=TITLE_SPACE+FIELD_SPACE)
+
     def get_val():
-        '''gets number from field'''
+        """gets number from field"""
         global field_number
         field_number = number_entry.get()
         if int(field_number) <= 4:
-            text_label['text'] = "Too few players"
+            form_text_label['text'] = "Too few players"
         elif int(field_number) > 20:
-            text_label['text'] = "Too many players"
+            form_text_label['text'] = "Too many players"
         else:
             curr_window.destroy()
-    done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_val)
-    done_button.place(x=20, y=UP_SHIFT * 3)
+    done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
+    done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
+    done_button.configure(background="red", foreground="white")
     WindowSingleton.use_and_destroy_instance()
     if (int(field_number)) == -1:
         logger.log_debug("Window for getting players number closed\n")
@@ -73,38 +90,47 @@ def get_players_number():
 
 def get_emails_form(players_number):
     '''creates and shows email form'''
+    background_color = "#A3D9FF"
+    foreground_color = "orange"
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
-    curr_window.title("Email Form")
-    text_label = Label(curr_window, text="Email Form", width=40, font=("bold", 20))
-    text_label.place(x=90, y=53)
+    curr_window.title("Email form")
+    curr_window.configure(background=background_color)
+    text_label = Label(curr_window, text="Insert players emails and names",
+                       width=40, font=("bold", 20), anchor="w")
+    text_label.place(x=380, y=53)
+    text_label.configure(background=background_color, foreground=foreground_color)
+
     entries = []
     labels = []
     emails_and_names = []
     for i in range(0, players_number):
-        labels.append(Label(curr_window, text="Player " + str(i + 1) +\
+        labels.append(Label(curr_window, background=background_color,
+                            foreground=foreground_color, text="Player " + str(i + 1) +\
                             " name:", width=20, font=("bold", 10)))
 
         labels[i*2].place(x=LEFT_SHIFT*4*floor(i/MAX_ENTRIES),\
-                          y=130+30*(i%MAX_ENTRIES))
+                          y=180+30*(i%MAX_ENTRIES))
 
         entries.append(Entry(curr_window))
 
         entries[i*2].place(x=LEFT_SHIFT*(4*(floor(i/MAX_ENTRIES))+1),\
-                           y=130+30*(i % MAX_ENTRIES))
+                           y=180+30*(i % MAX_ENTRIES))
 
-        labels.append(Label(curr_window, text="Player " + str(i + 1) +\
+        labels.append(Label(curr_window, background=background_color, foreground=foreground_color,
+                            text="Player " + str(i + 1) +\
                             " email:", width=20, font=("bold", 10)))
 
         labels[i * 2 + 1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 2),\
-                                y=130 + 30 * (i % MAX_ENTRIES))
+                                y=180 + 30 * (i % MAX_ENTRIES))
 
         entries.append(Entry(curr_window))
 
         entries[i * 2 +1].place(x=LEFT_SHIFT * (4 * floor(i / MAX_ENTRIES) + 3),\
-                                y=130 + 30 * (i % MAX_ENTRIES))
+                                y=180 + 30 * (i % MAX_ENTRIES))
 
     logger.log_debug("Created email fields")
+
     def check_different_names():
         different_names = True
         nonlocal emails_and_names
@@ -140,7 +166,8 @@ def get_emails_form(players_number):
             text_label['text'] = "Two or more names are identical"
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
-    done_button.place(x=80+LEFT_SHIFT*floor(players_number/MAX_ENTRIES), y=130+30*(MAX_ENTRIES+1))
+    done_button.configure(background="red", foreground="white")
+    done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
     WindowSingleton.use_and_destroy_instance()
     if emails_and_names != 0:
         logger.log_debug("Window for emails and names was closed\n")
@@ -158,18 +185,34 @@ def show_info(curr_info):
     screen_info = Text(curr_window)
     screen_info.insert(INSERT, curr_info)
     screen_info.pack()
-    done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=destroy_window)
+    done_button = Button(curr_window, fg="RED", height=2, width=20,
+                         text="Done", command=destroy_window)
     done_button.pack()
     WindowSingleton.use_and_destroy_instance()
     logger.log_debug("Info window closed")
 
-def create_voting_screen(player_window, player_names, vote_function):
+def create_voting_screen(player_window, player_names, vote_function, player_message="Time to vote"):
     '''screen populating function'''
+
+    background_color = "black"
+    player_window.configure(background=background_color)
+    player_window.title(player_message)
+
+    title_frame = Frame(player_window)
+    title_frame.pack()
+    title_frame.configure(background=background_color)
+    text_label = Label(title_frame, text=player_message, width=40,
+                       font=("bold", 20), anchor="w", justify="center")
+    text_label.configure(background="red")
+    text_label.pack()
+
     top_frame = Frame(player_window)
     top_frame.pack()
+    top_frame.configure(background=background_color)
 
     bottom_frame = Frame(player_window)
     bottom_frame.pack()
+    bottom_frame.configure(background=background_color)
 
     number_of_players = len(player_names)
     for i in range(0, number_of_players):
@@ -178,8 +221,11 @@ def create_voting_screen(player_window, player_names, vote_function):
             curr_frame = top_frame
         else:
             curr_frame = bottom_frame
-        done_button = Button(curr_frame, fg=COLORS[i % len(COLORS)], height=20, width=17, text=player_name, command=vote_function(player_window, player_name))
-        done_button.pack(side=LEFT)
+        vote_button = Button(curr_frame, fg="black", background=COLORS[i % len(COLORS)],
+                             height=20, width=17, text=player_name,
+                             command=vote_function(player_window, player_name))
+        vote_button.configure(font=("Courier", 10))
+        vote_button.pack(side=LEFT)
 
     WindowSingleton.use_and_destroy_instance()  # make sure buttons are constantly displayed
     logger.log_debug("Voting screen closed")
@@ -194,7 +240,7 @@ def day_vote(players_can_vote, votable_players):
     for player_name in players_can_vote:
         curr_window = WindowSingleton.get_instance().window
         curr_player = player_name
-        curr_window.title("DAY PHASE: " + curr_player + " votes ")
+        player_message = "DAY PHASE: " + curr_player + " votes "
 
         def day_vote_function(player_window, player_name):
             def callback():
@@ -202,7 +248,8 @@ def day_vote(players_can_vote, votable_players):
                 player_window.destroy()
             return callback
 
-        create_voting_screen(curr_window, votable_players, day_vote_function)
+        create_voting_screen(curr_window, votable_players, day_vote_function,
+                             player_message=player_message)
 
     hanged_player = NOBODY
     for player_name in votable_players:
@@ -217,7 +264,7 @@ def night_assassin_vote(town_names):
     global assassinated_person
     assassinated_person = NOBODY
     curr_window = WindowSingleton.get_instance().window
-    curr_window.title("NIGHT PHASE: " +  "Assassins kill: ")
+    player_message = "NIGHT PHASE: Assassins kill: "
 
     def assassin_vote_function(player_window, player_name):
         '''assassin vote'''
@@ -229,7 +276,8 @@ def night_assassin_vote(town_names):
 
         return callback
 
-    create_voting_screen(curr_window, town_names, assassin_vote_function)
+    create_voting_screen(curr_window, town_names, assassin_vote_function,
+                         player_message=player_message)
 
     logger.log_debug("Night victim was " + assassinated_person)
     return assassinated_person
@@ -240,7 +288,7 @@ def night_cop_vote(player_names):
     global checked_person
     checked_person = NOBODY
     curr_window = WindowSingleton.get_instance().window
-    curr_window.title("NIGHT PHASE: " +  "Cop checks: ")
+    player_message = "NIGHT PHASE: Cop checks: "
 
     def cop_vote_function(player_window, player_name):
         '''cop vote'''
@@ -252,7 +300,8 @@ def night_cop_vote(player_names):
 
         return callback
 
-    create_voting_screen(curr_window, player_names, cop_vote_function)
+    create_voting_screen(curr_window, player_names, cop_vote_function,
+                         player_message=player_message)
 
     logger.log_debug("Cop checked " + checked_person)
     return checked_person
@@ -263,7 +312,7 @@ def night_doctor_vote(player_names):
     global saved_person
     saved_person = NOBODY
     curr_window = WindowSingleton.get_instance().window
-    curr_window.title("NIGHT PHASE: " +  "Doctor saves: ")
+    player_message = "NIGHT PHASE: Doctor saves: "
 
     def doctor_vote_function(player_window, player_name):
         '''doctor vote'''
@@ -275,7 +324,8 @@ def night_doctor_vote(player_names):
 
         return callback
 
-    create_voting_screen(curr_window, player_names, doctor_vote_function)
+    create_voting_screen(curr_window, player_names, doctor_vote_function,
+                         player_message=player_message)
 
     logger.log_debug("Doctor saved " + saved_person)
     return saved_person
@@ -305,8 +355,9 @@ def night_mutilator_vote(player_names):
         return callback
 
     curr_window = WindowSingleton.get_instance().window
-    curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-    create_voting_screen(curr_window, player_names, mutilator_vote_function)
+    player_message = "NIGHT PHASE: Mutilator mutilates: "
+    create_voting_screen(curr_window, player_names, mutilator_vote_function,
+                         player_message=player_message)
 
     if mutilated_person != NOBODY:
         curr_window = WindowSingleton.get_instance().window

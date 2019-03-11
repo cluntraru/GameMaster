@@ -3,7 +3,7 @@ from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
 from math import floor
 import logger
 import sys
-from threading import Thread
+from threading import Thread, Lock
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
@@ -18,6 +18,7 @@ checked_person = NOBODY
 saved_person = NOBODY
 mutilated_person = NOBODY
 mutilation_place = NOBODY
+chosen_game = NOBODY
 field_number = "-1"
 just_voted = False
 window_open = False
@@ -30,14 +31,18 @@ def delete_children(window):
         item.destroy()
 
 
+get_instance_guard = Lock()
+
 class WindowSingleton:
     '''Singleton for window'''
     __instance = None
     @staticmethod
     def get_instance():
         """ Static access method. """
+        get_instance_guard.acquire()
         if WindowSingleton.__instance is None:
             WindowSingleton()
+        get_instance_guard.release()
         return WindowSingleton.__instance
     @staticmethod
     def reset_instance():
@@ -48,6 +53,7 @@ class WindowSingleton:
 
     def __init__(self):
         """ Virtually private constructor. """
+        print("here i am")
         if WindowSingleton.__instance is not None:
             pass
         else:
@@ -58,10 +64,10 @@ class WindowSingleton:
 
 def window_thread_start():
     """Creates the window(in a separate thread)"""
-    WindowSingleton()
+    window = WindowSingleton.get_instance().window
     global window_open
     window_open = True
-    WindowSingleton.get_instance().window.mainloop()
+    window.mainloop()
     window_open = False
     print("Exiting")
     sys.exit()
@@ -69,13 +75,6 @@ def window_thread_start():
 
 window_thread = Thread(target=window_thread_start)
 window_thread.start()
-
-print("YEEE BOI")
-
-
-
-
-
 
 
 def get_players_number():
@@ -239,13 +238,19 @@ def show_info(curr_info):
 
 def create_voting_screen(player_window, player_names, vote_function, player_message="Time to vote"):
     '''screen populating function'''
+    global window_open
+    while window_open is False:
+        pass
+    print("Show starts")
     player_window = WindowSingleton.get_instance().window
+
     background_color = "black"
     player_window.configure(background=background_color)
     player_window.title(player_message)
-
     logs_frame = Frame(player_window)
-    logs_frame.pack(side=LEFT)
+    if player_message != "Chose a game to play!":
+        logs_frame.pack(side=LEFT)
+        print(player_message)
     logs_label = Label(logs_frame, text="GAME LOGS:", height=60, width=20,
                        font=("bold", 10), background="blue", anchor=N)
     logs_label.configure(background="purple", foreground="white")
@@ -318,6 +323,31 @@ def day_vote(players_can_vote, votable_players):
             hanged_player = player_name
     logger.log_debug("The day victim was: " + hanged_player)
     return hanged_player
+
+
+def game_choice(games_list):
+    '''assassin vote'''
+    global chosen_game
+    chosen_game = NOBODY
+    curr_window = WindowSingleton.get_instance().window
+    player_message = "Chose a game to play!"
+
+    def game_choice_function(player_window, selected_game):
+        '''assassin vote'''
+        def callback():
+            '''callback'''
+            global chosen_game
+            chosen_game = selected_game
+            global just_voted
+            just_voted = True
+
+        return callback
+
+    create_voting_screen(curr_window, games_list, game_choice_function,
+                         player_message=player_message)
+
+    logger.log_debug("Chosen game was " + chosen_game)
+    return chosen_game
 
 
 def night_assassin_vote(town_names):
@@ -439,3 +469,4 @@ def night_mutilator_vote(player_names):
 # players_number=get_players_number()
 # print(get_emails_form(5))
 #show_info("hello")
+print(str(game_choice(["Whist", "Mafia"])))

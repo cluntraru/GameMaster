@@ -1,5 +1,5 @@
 '''Ui of mafia storyteller'''
-from tkinter import Frame, Tk, Button, Text, LEFT, INSERT, Label, Entry
+from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
 from math import floor
 import logger
 import sys
@@ -230,7 +230,7 @@ def show_info(curr_info):
         nonlocal done_was_clicked
         done_was_clicked = True
         WindowSingleton.reset_instance()
-    done_button = Button(curr_window, fg="RED", height=2, width=20,
+    done_button = Button(curr_window, fg="WHITE", background="RED", height=2, width=20,
                          text="Done", command=done_click)
     done_button.pack()
     while (not done_was_clicked) and window_open:
@@ -244,19 +244,30 @@ def create_voting_screen(player_window, player_names, vote_function, player_mess
     player_window.configure(background=background_color)
     player_window.title(player_message)
 
-    title_frame = Frame(player_window)
-    title_frame.pack()
+    logs_frame = Frame(player_window)
+    logs_frame.pack(side=LEFT)
+    logs_label = Label(logs_frame, text="GAME LOGS:", height=60, width=20,
+                       font=("bold", 10), background="blue", anchor=N)
+    logs_label.configure(background="purple", foreground="white")
+    logs_label.pack(side=TOP)
+
+    game_frame = Frame(player_window)
+    game_frame.configure(background=background_color)
+    game_frame.pack(side=LEFT)
+
+    title_frame = Frame(game_frame)
     title_frame.configure(background=background_color)
+    title_frame.pack()
     text_label = Label(title_frame, text=player_message, width=40,
                        font=("bold", 20), anchor="w", justify="center")
     text_label.configure(background="red")
     text_label.pack()
 
-    top_frame = Frame(player_window)
+    top_frame = Frame(game_frame)
     top_frame.pack()
     top_frame.configure(background=background_color)
 
-    bottom_frame = Frame(player_window)
+    bottom_frame = Frame(game_frame)
     bottom_frame.pack()
     bottom_frame.configure(background=background_color)
 
@@ -422,7 +433,7 @@ def night_mutilator_vote(player_names):
     logger.log_debug("Mutilator targeted " + mutilated_person)
     return (mutilated_person, mutilation_place)
 
-#lista = ["Marcel", "Ionela", "Trump", "Putin", "Atcineva"]
+#lista = ["Marcel", "Ionela", "Trump", "Putin", "Altcineva"]
 #lista.extend(lista)
 #lista.append("DA")
 # players_number=get_players_number()

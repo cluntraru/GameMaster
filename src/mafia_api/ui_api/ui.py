@@ -53,7 +53,6 @@ class WindowSingleton:
 
     def __init__(self):
         """ Virtually private constructor. """
-        print("here i am")
         if WindowSingleton.__instance is not None:
             pass
         else:
@@ -69,7 +68,7 @@ def window_thread_start():
     window_open = True
     window.mainloop()
     window_open = False
-    print("Exiting")
+    #print("Exiting")
     sys.exit()
 
 
@@ -241,7 +240,6 @@ def create_voting_screen(player_window, player_names, vote_function, player_mess
     global window_open
     while window_open is False:
         pass
-    print("Show starts")
     player_window = WindowSingleton.get_instance().window
 
     background_color = "black"
@@ -250,7 +248,6 @@ def create_voting_screen(player_window, player_names, vote_function, player_mess
     logs_frame = Frame(player_window)
     if player_message != "Chose a game to play!":
         logs_frame.pack(side=LEFT)
-        print(player_message)
     logs_label = Label(logs_frame, text="GAME LOGS:", height=60, width=20,
                        font=("bold", 10), background="blue", anchor=N)
     logs_label.configure(background="purple", foreground="white")
@@ -467,6 +464,5 @@ def night_mutilator_vote(player_names):
 #lista.extend(lista)
 #lista.append("DA")
 # players_number=get_players_number()
-# print(get_emails_form(5))
 #show_info("hello")
 print(str(game_choice(["Whist", "Mafia"])))

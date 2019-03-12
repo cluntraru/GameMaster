@@ -137,7 +137,8 @@ def play_day(cycle_count):
     still_alive = get_alive_players()
     can_vote = get_voting_players()
 
-    logger.log_info('Still alive: '  + str(still_alive))
+    #logger.log_info('Still alive: '  + str(still_alive))
+    io.add_logs('Still alive: '  + str(still_alive))
 
     lynched_name = io.get_lynched_name(can_vote, still_alive)
 
@@ -152,8 +153,8 @@ def play_day(cycle_count):
         kill(lynched_name)
 
     restore_voting_rights()
-    logger.log_info('\n---------- DAY ' + str(cycle_count) + ' END ----------\n')
-
+    #logger.log_info('\n---------- DAY ' + str(cycle_count) + ' END ----------\n')
+    io.add_logs('\n---------- DAY ' + str(cycle_count) + ' END ----------\n')
 
 def get_alive_players_minus_role(role_idx):
     ''' Get all live players except those that have a certain role. '''
@@ -268,7 +269,8 @@ def play_night(cycle_count):
     doctor_turn = bool(alive_cnt[Player.DOCTOR_IDX])
     mutilator_turn = bool(alive_cnt[Player.MTLT_IDX])
 
-    logger.log_info('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
+    #logger.log_info('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
+    io.add_logs('---------- NIGHT ' + str(cycle_count) + ' ----------\n')
     io.output('Everyone goes to sleep.\n')
 
     pause_between_roles()
@@ -292,8 +294,11 @@ def play_night(cycle_count):
     if patient and patient == assassinated:
         assassinated = None
 
-    logger.log_info('---------- NIGHT ' + str(cycle_count) + ' END ----------\n')
-    logger.log_info('---------- DAY ' + str(cycle_count + 1) + ' ----------\n')
+    #logger.log_info('---------- NIGHT ' + str(cycle_count) + ' END ----------\n')
+    #logger.log_info('---------- DAY ' + str(cycle_count + 1) + ' ----------\n')
+    io.add_logs('---------- NIGHT ' + str(cycle_count) + ' END ----------\n')
+    io.add_logs('---------- DAY ' + str(cycle_count + 1) + ' ----------\n')
+
 
     io.output('Everyone wakes up.\n')
     if game_over():
@@ -312,13 +317,16 @@ def play_night(cycle_count):
     else:
         io.output('Nobody was mutilated.')
 
-    logger.log_info('\n')
+    #logger.log_info('\n')
+    io.add_logs("\n")
 
 
 def play_game():
     ''' Runs the simulation. '''
     cycle_count = 1
-    logger.log_info('---------- DAY 1 ----------\n')
+    #logger.log_info('---------- DAY 1 ----------\n')
+    io.add_logs('---------- DAY 1 ----------\n')
+
     while not game_over():
         play_day(cycle_count)
         if game_over():
@@ -330,7 +338,8 @@ def play_game():
 
 def log_results():
     ''' Prints the scoreboard. '''
-    logger.log_info('---------- RESULTS ----------')
+    #logger.log_info('---------- RESULTS ----------')
+    io.add_logs('---------- RESULTS ----------')
     if suicidal_won():
         io.output("The suicidal person won!\n")
 

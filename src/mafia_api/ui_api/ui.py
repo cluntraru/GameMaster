@@ -19,9 +19,18 @@ saved_person = NOBODY
 mutilated_person = NOBODY
 mutilation_place = NOBODY
 chosen_game = NOBODY
+log_history = "GAME LOGS: "
 field_number = "-1"
 just_voted = False
 window_open = False
+
+def add_to_log_history(new_logs):
+    global log_history
+    log_history = log_history + "\n" + new_logs;
+
+def reset_log_history():
+    global log_history
+    log_history = "GAME LOGS: "
 
 
 def delete_children(window):
@@ -82,6 +91,7 @@ def get_players_number():
     background_color = "#A3D9FF"
     foreground_color = "orange"
 
+    add_to_log_history("")
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
     curr_window.title("Players number")
@@ -235,7 +245,7 @@ def show_info(curr_info):
         pass
     logger.log_debug("Info window closed")
 
-def create_voting_screen(player_window, player_names, vote_function, player_message="Time to vote"):
+def create_voting_screen(player_names, vote_function, player_message="Time to vote"):
     '''screen populating function'''
     global window_open
     while window_open is False:
@@ -248,7 +258,8 @@ def create_voting_screen(player_window, player_names, vote_function, player_mess
     logs_frame = Frame(player_window)
     if player_message != "Chose a game to play!":
         logs_frame.pack(side=LEFT)
-    logs_label = Label(logs_frame, text="GAME LOGS:", height=60, width=20,
+    global log_history
+    logs_label = Label(logs_frame, text=log_history, height=60, width=20,
                        font=("bold", 10), background="blue", anchor=N)
     logs_label.configure(background="purple", foreground="white")
     logs_label.pack(side=TOP)
@@ -282,7 +293,7 @@ def create_voting_screen(player_window, player_names, vote_function, player_mess
             curr_frame = bottom_frame
         vote_button = Button(curr_frame, fg="black", background=COLORS[i % len(COLORS)],
                              height=20, width=17, text=player_name,
-                             command=vote_function(player_window, player_name))
+                             command=vote_function(player_name))
         vote_button.configure(font=("Courier", 10))
         vote_button.pack(side=LEFT)
     global just_voted
@@ -304,14 +315,14 @@ def day_vote(players_can_vote, votable_players):
         curr_player = player_name
         player_message = "DAY PHASE: " + curr_player + " votes "
 
-        def day_vote_function(player_window, player_name):
+        def day_vote_function(player_name):
             def callback():
                 player_votes[player_name] += 1
                 global just_voted
                 just_voted = True
             return callback
 
-        create_voting_screen(curr_window, votable_players, day_vote_function,
+        create_voting_screen(votable_players, day_vote_function,
                              player_message=player_message)
 
     hanged_player = NOBODY
@@ -329,7 +340,7 @@ def game_choice(games_list):
     curr_window = WindowSingleton.get_instance().window
     player_message = "Chose a game to play!"
 
-    def game_choice_function(player_window, selected_game):
+    def game_choice_function(selected_game):
         '''assassin vote'''
         def callback():
             '''callback'''
@@ -340,7 +351,7 @@ def game_choice(games_list):
 
         return callback
 
-    create_voting_screen(curr_window, games_list, game_choice_function,
+    create_voting_screen(games_list, game_choice_function,
                          player_message=player_message)
 
     logger.log_debug("Chosen game was " + chosen_game)
@@ -354,7 +365,7 @@ def night_assassin_vote(town_names):
     curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Assassins kill: "
 
-    def assassin_vote_function(player_window, player_name):
+    def assassin_vote_function(player_name):
         '''assassin vote'''
         def callback():
             '''callback'''
@@ -365,7 +376,7 @@ def night_assassin_vote(town_names):
 
         return callback
 
-    create_voting_screen(curr_window, town_names, assassin_vote_function,
+    create_voting_screen(town_names, assassin_vote_function,
                          player_message=player_message)
 
     logger.log_debug("Night victim was " + assassinated_person)
@@ -379,7 +390,7 @@ def night_cop_vote(player_names):
     curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Cop checks: "
 
-    def cop_vote_function(player_window, player_name):
+    def cop_vote_function(player_name):
         '''cop vote'''
         def callback():
             '''callback'''
@@ -390,7 +401,7 @@ def night_cop_vote(player_names):
 
         return callback
 
-    create_voting_screen(curr_window, player_names, cop_vote_function,
+    create_voting_screen(player_names, cop_vote_function,
                          player_message=player_message)
 
     logger.log_debug("Cop checked " + checked_person)
@@ -404,7 +415,7 @@ def night_doctor_vote(player_names):
     curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Doctor saves: "
 
-    def doctor_vote_function(player_window, player_name):
+    def doctor_vote_function(player_name):
         '''doctor vote'''
         def callback():
             '''callback'''
@@ -415,7 +426,7 @@ def night_doctor_vote(player_names):
 
         return callback
 
-    create_voting_screen(curr_window, player_names, doctor_vote_function,
+    create_voting_screen(player_names, doctor_vote_function,
                          player_message=player_message)
 
     logger.log_debug("Doctor saved " + saved_person)
@@ -427,7 +438,7 @@ def night_mutilator_vote(player_names):
     global mutilated_person, mutilation_place
     mutilated_person = NOBODY
     mutilation_place = NOBODY
-    def mutilator_vote_function(player_window, player_name):
+    def mutilator_vote_function(player_name):
         '''mutilator vote'''
         def callback():
             '''callback'''
@@ -438,7 +449,7 @@ def night_mutilator_vote(player_names):
 
         return callback
 
-    def mutilator_place_function(player_window, place_name):
+    def mutilator_place_function(place_name):
         def callback():
             global mutilation_place
             mutilation_place = place_name[0]
@@ -449,13 +460,13 @@ def night_mutilator_vote(player_names):
 
     curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Mutilator mutilates: "
-    create_voting_screen(curr_window, player_names, mutilator_vote_function,
+    create_voting_screen(player_names, mutilator_vote_function,
                          player_message=player_message)
 
     if mutilated_person != NOBODY:
         curr_window = WindowSingleton.get_instance().window
         curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-        create_voting_screen(curr_window, ["Hand", "Mouth"], mutilator_place_function)
+        create_voting_screen(["Hand", "Mouth"], mutilator_place_function)
 
     logger.log_debug("Mutilator targeted " + mutilated_person)
     return (mutilated_person, mutilation_place)

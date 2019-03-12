@@ -15,6 +15,19 @@ import logger
 
 SPEAKER = None
 
+def add_logs(text):
+    if logger.is_debug_mode():
+        print(text)
+    else:
+        rlio.add_logs(text)
+
+def reset_logs():
+    if logger.is_debug_mode():
+        print("Logs reseted\n")
+    else:
+        rlio.reset_logs()
+
+
 def get_player_cnt():
     ''' Prompts for number of players and returns the result. '''
     if logger.is_debug_mode():

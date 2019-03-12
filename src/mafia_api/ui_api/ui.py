@@ -41,6 +41,7 @@ def delete_children(window):
 
 
 get_instance_guard = Lock()
+destroy_instance_guard = Lock()
 
 class WindowSingleton:
     '''Singleton for window'''
@@ -58,7 +59,13 @@ class WindowSingleton:
         """Static use and destroy method"""
         window = WindowSingleton.__instance.window
         delete_children(window)
-
+    @staticmethod
+    def destroy_instance():
+        destroy_instance_guard.acquire()
+        if WindowSingleton.__instance is not None:
+            WindowSingleton.__instance.window.destroy()
+            WindowSingleton.__instance = None
+        destroy_instance_guard.release()
 
     def __init__(self):
         """ Virtually private constructor. """
@@ -77,12 +84,14 @@ def window_thread_start():
     window_open = True
     window.mainloop()
     window_open = False
-    #print("Exiting")
+    print("Exiting")
     sys.exit()
 
 
-window_thread = Thread(target=window_thread_start)
-window_thread.start()
+def start_window_thread():
+    '''Starts the window thread'''
+    window_thread = Thread(target=window_thread_start)
+    window_thread.start()
 
 
 def get_players_number():
@@ -355,6 +364,7 @@ def game_choice(games_list):
                          player_message=player_message)
 
     logger.log_debug("Chosen game was " + chosen_game)
+    WindowSingleton.destroy_instance()
     return chosen_game
 
 

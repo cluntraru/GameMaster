@@ -6,6 +6,8 @@ import time
 
 import mafia_api.email_api.gm_email as gm_email
 import mafia_api.io_api.facade_io as io
+import mafia_api.ui_api.ui as mafia_ui
+
 from mafia_api.player_api.player import Player
 import logger
 
@@ -357,6 +359,7 @@ def log_results():
 
 def start():
     ''' Starts a game of Mafia. '''
+    mafia_ui.start_window_thread()
     if assign_roles():
         sys.exit()
 

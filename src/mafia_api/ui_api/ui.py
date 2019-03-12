@@ -476,4 +476,3 @@ def night_mutilator_vote(player_names):
 #lista.append("DA")
 # players_number=get_players_number()
 #show_info("hello")
-print(str(game_choice(["Whist", "Mafia"])))

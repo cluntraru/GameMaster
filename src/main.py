@@ -1,6 +1,7 @@
 ''' Entry point to GameMaster app. '''
 from argparse import ArgumentParser
 import mafia_api.mafia as mafia
+import mafia_api.ui_api.ui as mafia_ui
 import whist_api.whist as whist
 import logger
 
@@ -17,7 +18,7 @@ if __name__ == '__main__':
     logger.set_debug_mode(ARGS.debug)
     logger.set_speak_mode(not ARGS.textonly)
 
-    GAME = input('Do you want to play whist or mafia? ')
+    GAME = mafia_ui.game_choice(["mafia", "whist"])
     if GAME == 'mafia':
         mafia.start()
     elif GAME == 'whist':

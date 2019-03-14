@@ -1,9 +1,10 @@
 '''Ui of mafia storyteller'''
 from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
 from math import floor
-import logger
 import sys
 from threading import Thread, Lock
+import logger
+
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
@@ -26,6 +27,7 @@ window_open = False
 
 
 def _to_int(curr_str):
+    """convers str to int, returns -1 if impossible"""
     try:
         return int(curr_str)
     except ValueError:
@@ -33,23 +35,26 @@ def _to_int(curr_str):
 
 
 def add_to_log_history(new_logs):
+    """adds to log window"""
     global log_history
-    log_history = log_history + "\n" + new_logs;
+    log_history = log_history + "\n" + new_logs
 
 def reset_log_history():
+    """empties log window"""
     global log_history
     log_history = "GAME LOGS: "
 
 
 def delete_children(window):
+    """Deletes everything on window"""
     _list = window.winfo_children()
 
     for item in _list:
         item.destroy()
 
 
-get_instance_guard = Lock()
-destroy_instance_guard = Lock()
+GET_INSTANCE_GUARD = Lock()
+DESTROY_INSTANCE_GUARD = Lock()
 
 class WindowSingleton:
     '''Singleton for window'''
@@ -57,23 +62,24 @@ class WindowSingleton:
     @staticmethod
     def get_instance():
         """ Static access method. """
-        get_instance_guard.acquire()
+        GET_INSTANCE_GUARD.acquire()
         if WindowSingleton.__instance is None:
             WindowSingleton()
-        get_instance_guard.release()
+        GET_INSTANCE_GUARD.release()
         return WindowSingleton.__instance
     @staticmethod
     def reset_instance():
-        """Static use and destroy method"""
+        """Static method for reseting window method"""
         window = WindowSingleton.__instance.window
         delete_children(window)
     @staticmethod
     def destroy_instance():
-        destroy_instance_guard.acquire()
+        """Static method for destroying window"""
+        DESTROY_INSTANCE_GUARD.acquire()
         if WindowSingleton.__instance is not None:
             WindowSingleton.__instance.window.destroy()
             WindowSingleton.__instance = None
-        destroy_instance_guard.release()
+        DESTROY_INSTANCE_GUARD.release()
 
     def __init__(self):
         """ Virtually private constructor. """
@@ -131,14 +137,14 @@ def get_players_number():
         global field_number
 
         field_number = number_entry.get()
-        if not (4 < _to_int(field_number) <= 20):
+        if not 4 < _to_int(field_number) <= 20:
             form_text_label['text'] = "Ilegal number of players"
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
 
-    while (not (4 < _to_int(field_number) <= 20 ) and window_open):
+    while (not 4 < _to_int(field_number) <= 20) and window_open:
         pass
     WindowSingleton.reset_instance()
     return int(field_number)
@@ -202,7 +208,7 @@ def get_emails_form(players_number):
         nonempty_names = True
         nonlocal emails_and_names
         players_number = len(emails_and_names)
-        if(len(emails_and_names) == 0):
+        if players_number == 0:
             return False
         for i in range(0, players_number):
             if emails_and_names[i][0] == "":
@@ -321,7 +327,6 @@ def day_vote(players_can_vote, votable_players):
         player_votes[player_name] = 0
     player_votes[NOBODY] = 0
     for player_name in players_can_vote:
-        curr_window = WindowSingleton.get_instance().window
         curr_player = player_name
         player_message = "DAY PHASE: " + curr_player + " votes "
 
@@ -347,7 +352,6 @@ def game_choice(games_list):
     '''assassin vote'''
     global chosen_game
     chosen_game = NOBODY
-    curr_window = WindowSingleton.get_instance().window
     player_message = "Chose a game to play!"
 
     def game_choice_function(selected_game):
@@ -373,7 +377,6 @@ def night_assassin_vote(town_names):
     '''assassin vote'''
     global assassinated_person
     assassinated_person = NOBODY
-    curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Assassins kill: "
 
     def assassin_vote_function(player_name):
@@ -398,7 +401,6 @@ def night_cop_vote(player_names):
     '''cop vote'''
     global checked_person
     checked_person = NOBODY
-    curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Cop checks: "
 
     def cop_vote_function(player_name):
@@ -423,7 +425,6 @@ def night_doctor_vote(player_names):
     '''doctor vote'''
     global saved_person
     saved_person = NOBODY
-    curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Doctor saves: "
 
     def doctor_vote_function(player_name):
@@ -469,7 +470,6 @@ def night_mutilator_vote(player_names):
 
         return callback
 
-    curr_window = WindowSingleton.get_instance().window
     player_message = "NIGHT PHASE: Mutilator mutilates: "
     create_voting_screen(player_names, mutilator_vote_function,
                          player_message=player_message)

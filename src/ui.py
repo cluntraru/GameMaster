@@ -1,8 +1,6 @@
-from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
-from math import floor
+"""UI for choosing games"""
+from tkinter import Frame, Tk, Button, LEFT, Label
 import logger
-import sys
-from threading import Thread, Lock
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
@@ -10,7 +8,8 @@ MAX_ENTRIES = 10
 LEFT_SHIFT = 160
 FIELD_SPACE = 40
 TITLE_SPACE = 200
-
+chosen_game = NOBODY
+just_voted = False
 
 def create_voting_screen(player_names, vote_function, player_message="Time to vote"):
     '''screen populating function'''
@@ -77,7 +76,4 @@ def game_choice(games_list):
                          player_message=player_message)
 
     logger.log_debug("Chosen game was " + chosen_game)
-    print(chosen_game)
-
     return chosen_game
-

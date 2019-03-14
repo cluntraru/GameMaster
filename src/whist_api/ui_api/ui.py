@@ -1,8 +1,10 @@
-from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
+""""Implementation of a whist ui"""
+from tkinter import Frame, Tk, Button, Text, LEFT, TOP, INSERT, Label, Entry
 from math import floor
-import logger
 import sys
 from threading import Thread, Lock
+import logger
+
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
@@ -17,21 +19,14 @@ field_number = "-1"
 window_open = False
 
 def _to_int(curr_str):
+    """Converts str to int, returns -1 if impossible"""
     try:
         return int(curr_str)
     except ValueError:
         return -1
 
-def add_to_log_history(new_logs):
-    global log_history
-    log_history = log_history + "\n" + new_logs;
-
-def reset_log_history():
-    global log_history
-    log_history = "GAME LOGS: "
-
-
 def delete_children(window):
+    """Delets everything on the window"""
     _list = window.winfo_children()
 
     for item in _list:
@@ -59,6 +54,7 @@ class WindowSingleton:
         delete_children(window)
     @staticmethod
     def destroy_instance():
+        """Destroys the current window"""
         destroy_instance_guard.acquire()
         if WindowSingleton.__instance is not None:
             WindowSingleton.__instance.window.destroy()
@@ -97,7 +93,6 @@ def get_players_number():
     background_color = "#A3D9FF"
     foreground_color = "orange"
 
-    add_to_log_history("")
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
     curr_window.title("Players number")
@@ -130,7 +125,7 @@ def get_players_number():
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
 
-    while (not (4 <= _to_int(field_number) <= 6 ) and window_open):
+    while not (4 <= _to_int(field_number) <= 6) and window_open:
         pass
     WindowSingleton.reset_instance()
     return int(field_number)
@@ -182,7 +177,7 @@ def get_names_form(players_number):
         nonempty_names = True
         nonlocal player_names
         players_number = len(player_names)
-        if(len(player_names) == 0):
+        if players_number == 0:
             return False
         for i in range(0, players_number):
             if player_names[i] == "":
@@ -208,20 +203,21 @@ def get_names_form(players_number):
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.configure(background="red", foreground="white")
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
-
-    while (not (check_empty_names() and check_different_names())) and window_open:
+    print("LOL")
+    while not (check_empty_names() and check_different_names() and window_open):
         pass
+    print("WTF")
     WindowSingleton.reset_instance()
     return player_names
 
 
 def get_player_number_input(player_name, allowed_choices, input_type):
+    """Functin used when the player has to insert a bid or result"""
     global field_number
     field_number = -1
     background_color = "#A3D9FF"
     foreground_color = "orange"
 
-    add_to_log_history("")
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
     curr_window.title("Players number")
@@ -296,10 +292,12 @@ def show_scoreboard(player_names, target_round, scoreboard):
     player_frame = Frame(player_window, height=1, width=200)
     player_frame.pack(side=TOP)
 
-    name_label = Label(player_frame, text="Players:", heigh=1, width=20, background="black", foreground="white")
+    name_label = Label(player_frame, text="Players:", heigh=1, width=20,
+                       background="black", foreground="white")
     name_label.pack(side=LEFT)
     for player_name in player_names:
-        name_label = Label(player_frame, text=player_name, heigh=1, width=20, background="black", foreground="white")
+        name_label = Label(player_frame, text=player_name, heigh=1, width=20,
+                           background="black", foreground="white")
         name_label.pack(side=LEFT)
 
     for round_number in range(0, target_round + 1):
@@ -307,11 +305,12 @@ def show_scoreboard(player_names, target_round, scoreboard):
         round_frame = Frame(player_window, height=1, width=200)
         round_frame.pack(side=TOP)
 
-        round_label = Label(round_frame, text="Round " + str(round_number + 1) + ":", heigh=1, width=20,
-                            background="white", foreground="black")
+        round_label = Label(round_frame, text="Round " + str(round_number + 1) + ":",
+                            heigh=1, width=20, background="white", foreground="black")
         round_label.pack(side=LEFT)
         for player_score in scoreboard[round_number]:
-            player_label = Label(round_frame, text=str(player_score), heigh=1, width=20, background="white", foreground="black")
+            player_label = Label(round_frame, text=str(player_score), heigh=1, width=20,
+                                 background="white", foreground="black")
             player_label.pack(side=LEFT)
 
     done_was_clicked = False

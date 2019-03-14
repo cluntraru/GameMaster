@@ -24,6 +24,14 @@ field_number = "-1"
 just_voted = False
 window_open = False
 
+
+def _to_int(curr_str):
+    try:
+        return int(curr_str)
+    except ValueError:
+        return -1
+
+
 def add_to_log_history(new_logs):
     global log_history
     log_history = log_history + "\n" + new_logs;
@@ -84,7 +92,6 @@ def window_thread_start():
     window_open = True
     window.mainloop()
     window_open = False
-    print("Exiting")
     sys.exit()
 
 
@@ -111,8 +118,8 @@ def get_players_number():
     title_text_label.place(x=400, y=30, anchor="w")
     title_text_label.configure(background=background_color, foreground=foreground_color)
 
-    form_text_label = Label(curr_window, text="Insert number of players:",
-                            width=20, font=("bold", 10))
+    form_text_label = Label(curr_window, text="Insert number of players, between 4 and 21:",
+                            width=35, font=("bold", 10), anchor="w")
     form_text_label.place(x=10, y=TITLE_SPACE)
     form_text_label.configure(background=background_color, foreground=foreground_color)
 
@@ -124,20 +131,14 @@ def get_players_number():
         global field_number
 
         field_number = number_entry.get()
-        if int(field_number) <= 4:
-            form_text_label['text'] = "Too few players"
-        elif int(field_number) > 20:
-            form_text_label['text'] = "Too many players"
+        if not (4 < _to_int(field_number) <= 20):
+            form_text_label['text'] = "Ilegal number of players"
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
 
-    if (int(field_number)) == -1:
-        logger.log_debug("Window for getting players number closed\n")
-    else:
-        logger.log_debug("Number of player: " + field_number)
-    while (not (4 < int(field_number) <= 20 ) and window_open):
+    while (not (4 < _to_int(field_number) <= 20 ) and window_open):
         pass
     WindowSingleton.reset_instance()
     return int(field_number)

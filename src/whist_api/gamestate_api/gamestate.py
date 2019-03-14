@@ -47,6 +47,7 @@ class GameState:
             # print(self._bid_history, curr_round, player_idx)
             bid = self._bid_history[target_round][player_idx]
             result = self._result_history[target_round][player_idx]
+
             if bid == result:
                 point_diff = 5 + bid
             else:
@@ -73,7 +74,6 @@ class GameState:
         for j in range(0, self._card_cnt + 1):
             if bid_sum + j != self._card_cnt:
                 possible_dealer_bids.append(j)
-
         dealer_bid = io.get_bid(self._names[self._dealer], possible_dealer_bids)
         self._bid_history[self._round][self._dealer] = dealer_bid
 

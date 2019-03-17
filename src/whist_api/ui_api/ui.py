@@ -18,7 +18,7 @@ log_history = "GAME LOGS: "
 field_number = "-1"
 window_open = False
 
-def _to_int(curr_str):
+def to_int(curr_str):
     """Converts str to int, returns -1 if impossible"""
     try:
         return int(curr_str)
@@ -94,11 +94,15 @@ def get_players_number():
     foreground_color = "orange"
 
     curr_window = WindowSingleton.get_instance().window
+
+    if window_open is False:
+        raise IOError
+
     curr_window.geometry('500x500')
     curr_window.title("Players number")
     curr_window.configure(background=background_color)
 
-    title_text_label = Label(curr_window, text="Welcome to Mafia", width=20, font=("bold", 30))
+    title_text_label = Label(curr_window, text="Welcome to Whist", width=20, font=("bold", 30))
     #title_text_label.configure(anchor="n")
     title_text_label.place(x=400, y=30, anchor="w")
     title_text_label.configure(background=background_color, foreground=foreground_color)
@@ -125,7 +129,7 @@ def get_players_number():
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
 
-    while not (4 <= _to_int(field_number) <= 6) and window_open:
+    while not (4 <= to_int(field_number) <= 6) and window_open:
         pass
     WindowSingleton.reset_instance()
     return int(field_number)
@@ -134,7 +138,20 @@ def get_names_form(players_number):
     '''creates and shows name form'''
     background_color = "#A3D9FF"
     foreground_color = "orange"
+
+    try:
+        players_number = int(players_number)
+    except ValueError:
+        raise ValueError
+
+    if players_number < 2:
+        raise ValueError
+
     curr_window = WindowSingleton.get_instance().window
+
+    if window_open is False:
+        raise IOError
+
     curr_window.geometry('500x500')
     curr_window.title("Name form")
     curr_window.configure(background=background_color)
@@ -248,14 +265,14 @@ def get_player_number_input(player_name, allowed_choices, input_type):
         global field_number
 
         field_number = number_entry.get()
-        if not element_in_list(allowed_choices, _to_int(field_number)):
+        if not element_in_list(allowed_choices, to_int(field_number)):
             form_text_label['text'] = "Illegal choice! Possible choices: " + str(allowed_choices)
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE + FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
 
-    while not element_in_list(allowed_choices, _to_int(field_number)) and window_open:
+    while not element_in_list(allowed_choices, to_int(field_number)) and window_open:
         pass
     WindowSingleton.reset_instance()
     return int(field_number)

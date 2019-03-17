@@ -3,7 +3,7 @@ from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
 from math import floor
 import sys
 from threading import Thread, Lock
-#import logger
+import logger
 
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
@@ -177,6 +177,10 @@ def get_emails_form(players_number):
     background_color = "#A3D9FF"
     foreground_color = "orange"
     curr_window = WindowSingleton.get_instance().window
+
+    if window_open is False:
+        raise IOError
+
     curr_window.geometry('500x500')
     curr_window.title("Email form")
     curr_window.configure(background=background_color)

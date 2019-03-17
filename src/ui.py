@@ -15,7 +15,7 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     '''screen populating function'''
     player_window = Tk()
 
-    background_color = "black"
+    background_color = "white"
     player_window.configure(background=background_color)
     player_window.title(player_message)
 

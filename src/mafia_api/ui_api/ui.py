@@ -3,7 +3,7 @@ from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
 from math import floor
 import sys
 from threading import Thread, Lock
-import logger
+#import logger
 
 
 COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
@@ -26,7 +26,7 @@ just_voted = False
 window_open = False
 
 
-def _to_int(curr_str):
+def to_int(curr_str):
     """convers str to int, returns -1 if impossible"""
     try:
         return int(curr_str)
@@ -107,6 +107,16 @@ def start_window_thread():
     window_thread.start()
 
 
+def close_window():
+    global window_open
+    while window_open is False:
+        pass
+    if window_open is True:
+        WindowSingleton.destroy_instance()
+        window_open = False
+    return window_open
+
+
 def get_players_number():
     '''gets players number'''
 
@@ -115,6 +125,10 @@ def get_players_number():
 
     add_to_log_history("")
     curr_window = WindowSingleton.get_instance().window
+
+    if window_open is False:
+        raise IOError
+
     curr_window.geometry('500x500')
     curr_window.title("Players number")
     curr_window.configure(background=background_color)
@@ -137,14 +151,14 @@ def get_players_number():
         global field_number
 
         field_number = number_entry.get()
-        if not 4 < _to_int(field_number) <= 20:
+        if not 4 < to_int(field_number) <= 20:
             form_text_label['text'] = "Ilegal number of players"
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background="red", foreground="white")
 
-    while (not 4 < _to_int(field_number) <= 20) and window_open:
+    while (not 4 < to_int(field_number) <= 20) and window_open:
         pass
     WindowSingleton.reset_instance()
     return int(field_number)
@@ -152,6 +166,14 @@ def get_players_number():
 
 def get_emails_form(players_number):
     '''creates and shows email form'''
+
+    try:
+        players_number = int(players_number)
+    except ValueError:
+        raise ValueError
+
+    if players_number < 2:
+        raise ValueError
     background_color = "#A3D9FF"
     foreground_color = "orange"
     curr_window = WindowSingleton.get_instance().window

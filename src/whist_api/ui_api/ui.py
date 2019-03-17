@@ -1,6 +1,7 @@
 """"Implementation of a whist ui"""
 from tkinter import Frame, Tk, Button, Text, LEFT, TOP, INSERT, Label, Entry
 from math import floor
+import random
 import sys
 from threading import Thread, Lock
 import logger
@@ -220,10 +221,8 @@ def get_names_form(players_number):
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.configure(background="red", foreground="white")
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
-    print("LOL")
     while not (check_empty_names() and check_different_names() and window_open):
         pass
-    print("WTF")
     WindowSingleton.reset_instance()
     return player_names
 
@@ -234,6 +233,8 @@ def get_player_number_input(player_name, allowed_choices, input_type):
     field_number = -1
     background_color = "#A3D9FF"
     foreground_color = "orange"
+
+    #return allowed_choices[random.randint(0, len(allowed_choices) - 1)]
 
     curr_window = WindowSingleton.get_instance().window
     curr_window.geometry('500x500')
@@ -251,26 +252,28 @@ def get_player_number_input(player_name, allowed_choices, input_type):
     form_text_label.place(x=10, y=TITLE_SPACE)
     form_text_label.configure(background=background_color, foreground=foreground_color)
 
-    number_entry = Entry(curr_window)
-    number_entry.place(x=20, width=20, y=TITLE_SPACE + FIELD_SPACE)
+    #number_frame = Frame(curr_window)
+    #number_frame.place(x=20, width=30, y=TITLE_SPACE + FIELD_SPACE)
 
-    def element_in_list(numbers_list, querried_number):
+    def element_in_list(numbers_list, queried_number):
         for number in numbers_list:
-            if querried_number == number:
+            if queried_number == number:
                 return True
         return False
 
-    def get_val():
-        """gets number from field"""
-        global field_number
+    def button_clicked(player_choice):
+        """function called when player clicks a button"""
+        def get_val():
+            """gets number from field"""
+            global field_number
+            field_number = player_choice
+        return get_val
 
-        field_number = number_entry.get()
-        if not element_in_list(allowed_choices, to_int(field_number)):
-            form_text_label['text'] = "Illegal choice! Possible choices: " + str(allowed_choices)
-
-    done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
-    done_button.place(x=20, y=TITLE_SPACE + FIELD_SPACE * 2)
-    done_button.configure(background="red", foreground="white")
+    for i in range(0, len(allowed_choices)):
+            done_button = Button(curr_window, fg="RED", height=1, width=5,
+                                 text=str(allowed_choices[i]), command=button_clicked(allowed_choices[i]))
+            done_button.place(x=25*(2*i+1), y=TITLE_SPACE + FIELD_SPACE, anchor="w")
+            done_button.configure(background="red", foreground="white")
 
     while not element_in_list(allowed_choices, to_int(field_number)) and window_open:
         pass

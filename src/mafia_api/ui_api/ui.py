@@ -95,6 +95,9 @@ def window_thread_start():
     """Creates the window(in a separate thread)"""
     window = WindowSingleton.get_instance().window
     global window_open
+    width_value = window.winfo_screenwidth()
+    height_value = window.winfo_screenheight()
+    window.geometry("%dx%d+0+0" % (width_value, height_value))
     window_open = True
     window.mainloop()
     window_open = False
@@ -105,6 +108,8 @@ def start_window_thread():
     '''Starts the window thread'''
     window_thread = Thread(target=window_thread_start)
     window_thread.start()
+    while window_open is False:
+        pass
 
 
 def close_window():
@@ -129,7 +134,7 @@ def get_players_number():
     if window_open is False:
         raise IOError
 
-    curr_window.geometry('500x500')
+    #curr_window.geometry('500x500')
     curr_window.title("Players number")
     curr_window.configure(background=background_color)
 
@@ -181,7 +186,6 @@ def get_emails_form(players_number):
     if window_open is False:
         raise IOError
 
-    curr_window.geometry('500x500')
     curr_window.title("Email form")
     curr_window.configure(background=background_color)
     text_label = Label(curr_window, text="Insert players emails and names",

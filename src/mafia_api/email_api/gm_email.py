@@ -1,7 +1,6 @@
 ''' E-mail functionality '''
 import smtplib
-import io_api.logger as logger
-
+import logger
 
 def get_msg_from_name(name, player_data):
     ''' Returns message to email to player containing role. '''

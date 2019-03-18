@@ -1,2 +1,2 @@
 ''' Package initialization. '''
-import ui_api.ui
+import mafia_api.mafia

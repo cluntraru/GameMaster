@@ -1,8 +1,14 @@
 ''' Functions that get input from UI. '''
 import random
-import player_api.player as pl
-import ui_api.ui as ui
-import email_api.gm_email as email
+import mafia_api.player_api.player as pl
+import mafia_api.ui_api.ui as ui
+import mafia_api.email_api.gm_email as email
+
+def add_logs(text):
+    ui.add_to_log_history(text)
+
+def reset_logs():
+    ui.reset_logs()
 
 def get_player_cnt():
     ''' UI prompts for number of players and returns the result. '''

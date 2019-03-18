@@ -1,2 +1,2 @@
 ''' Package initialization. '''
-import email_api.gm_email
+import whist_api.ui_api.ui

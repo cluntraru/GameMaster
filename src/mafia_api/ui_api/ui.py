@@ -116,6 +116,7 @@ def start_window_thread():
 
 
 def close_window():
+    """Closes the window if it is open"""
     global window_open
     while window_open is False:
         pass
@@ -172,15 +173,15 @@ def get_players_number():
     return int(field_number)
 
 
-def get_emails_form(players_number):
+def get_emails_form(arg_players_number):
     '''creates and shows email form'''
 
     try:
-        players_number = int(players_number)
+        arg_players_number = int(arg_players_number)
     except ValueError:
         raise ValueError
 
-    if players_number < 2:
+    if arg_players_number < 2:
         raise ValueError
     background_color = ANTI_FLASH_WHITE
     foreground_color = UMBER
@@ -199,7 +200,7 @@ def get_emails_form(players_number):
     entries = []
     labels = []
     emails_and_names = []
-    for i in range(0, players_number):
+    for i in range(0, arg_players_number):
         labels.append(Label(curr_window, background=background_color,
                             foreground=foreground_color, text="Player " + str(i + 1) +\
                             " name:", width=20, font=("bold", 10)))
@@ -230,45 +231,51 @@ def get_emails_form(players_number):
         identical_names = False
         nonlocal emails_and_names
         players_number = len(emails_and_names)
-        for i in range(0, players_number):
-            for j in range(0, players_number):
-                if i != j:
-                    if emails_and_names[i][0] == emails_and_names[j][0]:
-                        identical_names = True
+        try:
+            for i in range(0, players_number):
+                for j in range(0, players_number):
+                    if i != j:
+                        if emails_and_names[i][0] == emails_and_names[j][0]:
+                            identical_names = True
+        except IndexError:
+            identical_names = True
         return identical_names
 
     def are_empty_names():
         empty_names = False
         nonlocal emails_and_names
         players_number = len(emails_and_names)
-        if players_number == 0:
+        if players_number != arg_players_number:
             empty_names = True
-        for i in range(0, players_number):
-            if emails_and_names[i][0] == "":
-                empty_names = True
+        try:
+            for i in range(0, players_number):
+                if emails_and_names[i][0] == "":
+                    empty_names = True
+        except IndexError:
+            empty_names = True
         return empty_names
 
     def get_vals():
         '''gets emails from fields'''
         nonlocal emails_and_names
         emails_and_names = []
-        for i in range(0, players_number):
-            emails_and_names.append((entries[i*2].get(), entries[i * 2 + 1].get()))
+        for i in range(0, arg_players_number):
+            if entries[i*2].get() != "":
+                emails_and_names.append((entries[i*2].get(), entries[i * 2 + 1].get()))
         identical_names = are_identical_names()
         empty_names = are_empty_names()
 
         if not (identical_names or empty_names):
             pass
-        elif empty_names is True:
-            text_label['text'] = "One or more names are empty"
-        elif identical_names is True:
-            text_label['text'] = "Two or more names are identical"
+        else:
+            text_label['text'] = "Empty or identical names"
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
 
-    while (are_empty_names() or are_identical_names()) and window_open:
+    while (len(emails_and_names) != arg_players_number or are_empty_names()
+           or are_identical_names()) and window_open:
         pass
         #logger.log_debug("Window for emails and names was closed\n")
     WindowSingleton.reset_instance()
@@ -321,7 +328,7 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     title_frame.configure(background=background_color)
     title_frame.pack()
     text_label = Label(title_frame, text=player_message, width=40,
-                       font=("bold", 20), bg = UMBER, fg=ANTI_FLASH_WHITE,
+                       font=("bold", 20), bg=UMBER, fg=ANTI_FLASH_WHITE,
                        anchor="w", justify="center")
     text_label.pack()
 

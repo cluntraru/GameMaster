@@ -1,7 +1,7 @@
 """"Implementation of a whist ui"""
 from tkinter import Frame, Tk, Button, Text, LEFT, TOP, INSERT, Label, Entry
 from math import floor
-import random
+#import random
 import sys
 from threading import Thread, Lock
 import logger
@@ -186,23 +186,33 @@ def get_names_form(input_players_number):
     logger.log_debug("Created name fields")
 
     def are_identical_names():
+        """checks if there are identical names in player_names"""
+        nonlocal player_names
         identical_names = False
         players_number = len(player_names)
-        for i in range(0, players_number):
-            for j in range(0, players_number):
-                if i != j:
-                    if str(player_names[i]) == str(player_names[j]):
-                        identical_names = True
+        try:
+            for i in range(0, players_number):
+                for j in range(0, players_number):
+                    if i != j:
+                        if str(player_names[i]) == str(player_names[j]):
+                            identical_names = True
+        except IndexError:
+            identical_names = True
+
         return identical_names
 
     def are_empty_names():
+        """checks if there is any empty name is player_names"""
         empty_names = False
         players_number = len(player_names)
-        if players_number == 0:
+        if players_number != input_players_number:
             return True
-        for i in range(0, players_number):
-            if player_names[i] == "":
-                empty_names = True
+        try:
+            for i in range(0, players_number):
+                if player_names[i] == "":
+                    empty_names = True
+        except IndexError:
+            empty_names = True
         return empty_names
 
     def get_vals():
@@ -210,20 +220,21 @@ def get_names_form(input_players_number):
         nonlocal player_names
         player_names = []
         for i in range(0, input_players_number):
-            player_names.append(entries[i].get())
+            if entries[i].get() != "":
+                player_names.append(entries[i].get())
         identical_names = are_identical_names()
         empty_names = are_empty_names()
         if not (identical_names or empty_names):
             pass
-        elif empty_names is True:
-            text_label['text'] = "One or more names are empty"
-        elif identical_names is True:
-            text_label['text'] = "Two or more names are identical"
+        else:
+            text_label['text'] = "Empty or identical names"
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
     done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
-    while (are_empty_names() or are_identical_names()) and window_open:
+    while window_open is True and ((len(player_names) != input_players_number)
+                                   or (are_empty_names() is True) or
+                                   (are_identical_names() is True)):
         pass
     WindowSingleton.reset_instance()
     return player_names
@@ -270,11 +281,13 @@ def get_player_number_input(player_name, allowed_choices, input_type):
             field_number = player_choice
         return get_val
 
-    for i in range(0, len(allowed_choices)):
-            option_button = Button(curr_window, fg="RED", height=1, width=5,
-                                 text=str(allowed_choices[i]), command=button_clicked(allowed_choices[i]))
-            option_button.place(x=25*(2*i+1), y=TITLE_SPACE + FIELD_SPACE, anchor="w")
-            option_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
+    choices_number = len(allowed_choices)
+    for i in range(0, choices_number):
+        option_button = Button(curr_window, fg="RED", height=1, width=5,
+                               text=str(allowed_choices[i]),
+                               command=button_clicked(allowed_choices[i]))
+        option_button.place(x=25*(2*i+1), y=TITLE_SPACE + FIELD_SPACE, anchor="w")
+        option_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
 
     while not element_in_list(allowed_choices, to_int(field_number)) and window_open:
         pass

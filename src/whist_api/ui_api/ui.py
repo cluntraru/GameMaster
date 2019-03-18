@@ -6,8 +6,6 @@ import sys
 from threading import Thread, Lock
 import logger
 
-
-COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
 MAX_ENTRIES = 10
 LEFT_SHIFT = 160
@@ -18,6 +16,11 @@ TITLE_SPACE = 200
 log_history = "GAME LOGS: "
 field_number = "-1"
 window_open = False
+
+ANTI_FLASH_WHITE = "#F0F2EF"
+UMBER = "#5C5346"
+SPICY_MIX = "#8C6057"
+LIGHT_MOSS_GREEN = "#AFD5AA"
 
 def to_int(curr_str):
     """Converts str to int, returns -1 if impossible"""
@@ -95,8 +98,8 @@ def start_window_thread():
 def get_players_number():
     '''gets players number'''
 
-    background_color = "#A3D9FF"
-    foreground_color = "orange"
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
 
     curr_window = WindowSingleton.get_instance().window
 
@@ -129,26 +132,26 @@ def get_players_number():
         elif int(field_number) > 6:
             form_text_label['text'] = "Too many players"
 
-    done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
+    done_button = Button(curr_window, fg=ANTI_FLASH_WHITE, bg=SPICY_MIX,
+                         height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
-    done_button.configure(background="red", foreground="white")
 
     while not (4 <= to_int(field_number) <= 6) and window_open:
         pass
     WindowSingleton.reset_instance()
     return int(field_number)
 
-def get_names_form(players_number):
+def get_names_form(input_players_number):
     '''creates and shows name form'''
-    background_color = "#A3D9FF"
-    foreground_color = "orange"
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
 
     try:
-        players_number = int(players_number)
+        input_players_number = int(input_players_number)
     except ValueError:
         raise ValueError
 
-    if players_number < 2:
+    if input_players_number < 2:
         raise ValueError
 
     curr_window = WindowSingleton.get_instance().window
@@ -166,7 +169,7 @@ def get_names_form(players_number):
     entries = []
     labels = []
     player_names = []
-    for i in range(0, players_number):
+    for i in range(0, input_players_number):
         labels.append(Label(curr_window, background=background_color,
                             foreground=foreground_color, text="Player " + str(i + 1) +\
                             " name:", width=20, font=("bold", 10)))
@@ -182,48 +185,47 @@ def get_names_form(players_number):
 
     logger.log_debug("Created name fields")
 
-    def check_different_names():
-        different_names = True
-        nonlocal player_names
+    def are_identical_names():
+        identical_names = False
         players_number = len(player_names)
         for i in range(0, players_number):
             for j in range(0, players_number):
                 if i != j:
-                    if player_names[i] == player_names[j]:
-                        different_names = False
-        return different_names
+                    if str(player_names[i]) == str(player_names[j]):
+                        identical_names = True
+        print(identical_names)
+        print(input_players_number)
+        return identical_names
 
-    def check_empty_names():
-        nonempty_names = True
-        nonlocal player_names
+    def are_empty_names():
+        empty_names = False
         players_number = len(player_names)
         if players_number == 0:
-            return False
+            return True
         for i in range(0, players_number):
             if player_names[i] == "":
-                nonempty_names = False
-        return nonempty_names
+                empty_names = True
+        return empty_names
 
     def get_vals():
         '''gets emails from fields'''
         nonlocal player_names
         player_names = []
-        for i in range(0, players_number):
+        for i in range(0, input_players_number):
             player_names.append(entries[i].get())
-        different_names = check_different_names()
-        nonempty_names = check_empty_names()
-
-        if different_names and nonempty_names:
+        identical_names = are_identical_names()
+        empty_names = are_empty_names()
+        if not (identical_names or empty_names):
             pass
-        elif nonempty_names is False:
+        elif empty_names is True:
             text_label['text'] = "One or more names are empty"
-        elif different_names is False:
+        elif identical_names is True:
             text_label['text'] = "Two or more names are identical"
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
-    done_button.configure(background="red", foreground="white")
+    done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
-    while not (check_empty_names() and check_different_names() and window_open):
+    while (are_empty_names() or are_identical_names()) and window_open:
         pass
     WindowSingleton.reset_instance()
     return player_names
@@ -233,8 +235,8 @@ def get_player_number_input(player_name, allowed_choices, input_type):
     """Functin used when the player has to insert a bid or result"""
     global field_number
     field_number = -1
-    background_color = "#A3D9FF"
-    foreground_color = "orange"
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
 
     #return allowed_choices[random.randint(0, len(allowed_choices) - 1)]
 
@@ -271,10 +273,10 @@ def get_player_number_input(player_name, allowed_choices, input_type):
         return get_val
 
     for i in range(0, len(allowed_choices)):
-            done_button = Button(curr_window, fg="RED", height=1, width=5,
+            option_button = Button(curr_window, fg="RED", height=1, width=5,
                                  text=str(allowed_choices[i]), command=button_clicked(allowed_choices[i]))
-            done_button.place(x=25*(2*i+1), y=TITLE_SPACE + FIELD_SPACE, anchor="w")
-            done_button.configure(background="red", foreground="white")
+            option_button.place(x=25*(2*i+1), y=TITLE_SPACE + FIELD_SPACE, anchor="w")
+            option_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
 
     while not element_in_list(allowed_choices, to_int(field_number)) and window_open:
         pass
@@ -304,8 +306,8 @@ def show_info(curr_info):
 
 def show_scoreboard(player_names, target_round, scoreboard):
     """Shows scoreboard in window"""
-    background_color = "#A3D9FF"
-    foreground_color = "orange"
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
     player_window = WindowSingleton.get_instance().window
     title_text_label = Label(player_window, text="SCOREBOARD\n\n", foreground=foreground_color,
                              background=background_color, width=20, font=("bold", 30))
@@ -341,8 +343,8 @@ def show_scoreboard(player_names, target_round, scoreboard):
         done_was_clicked = True
         WindowSingleton.reset_instance()
 
-    done_button = Button(player_window, fg="WHITE", background="RED", height=2, width=20,
-                         text="Done", command=done_click)
+    done_button = Button(player_window, fg=ANTI_FLASH_WHITE, bg=SPICY_MIX,
+                         height=2, width=20, text="Done", command=done_click)
     done_button.pack()
     while (not done_was_clicked) and window_open:
         pass

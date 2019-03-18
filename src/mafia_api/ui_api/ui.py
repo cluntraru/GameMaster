@@ -5,8 +5,6 @@ import sys
 from threading import Thread, Lock
 import logger
 
-
-COLORS = ["green", "blue", "yellow", "orange", "purple", "brown"]
 NOBODY = "NONE"
 MAX_ENTRIES = 10
 LEFT_SHIFT = 160
@@ -24,6 +22,11 @@ log_history = "GAME LOGS: "
 field_number = "-1"
 just_voted = False
 window_open = False
+
+ANTI_FLASH_WHITE = "#F0F2EF"
+UMBER = "#5C5346"
+SPICY_MIX = "#8C6057"
+LIGHT_MOSS_GREEN = "#AFD5AA"
 
 
 def to_int(curr_str):
@@ -125,8 +128,8 @@ def close_window():
 def get_players_number():
     '''gets players number'''
 
-    background_color = "#A3D9FF"
-    foreground_color = "orange"
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
 
     add_to_log_history("")
     curr_window = WindowSingleton.get_instance().window
@@ -161,7 +164,7 @@ def get_players_number():
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
     done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
-    done_button.configure(background="red", foreground="white")
+    done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
 
     while (not 4 < to_int(field_number) <= 20) and window_open:
         pass
@@ -179,8 +182,8 @@ def get_emails_form(players_number):
 
     if players_number < 2:
         raise ValueError
-    background_color = "#A3D9FF"
-    foreground_color = "orange"
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
     curr_window = WindowSingleton.get_instance().window
 
     if window_open is False:
@@ -223,27 +226,27 @@ def get_emails_form(players_number):
 
     logger.log_debug("Created email fields")
 
-    def check_different_names():
-        different_names = True
+    def are_identical_names():
+        identical_names = False
         nonlocal emails_and_names
         players_number = len(emails_and_names)
         for i in range(0, players_number):
             for j in range(0, players_number):
                 if i != j:
                     if emails_and_names[i][0] == emails_and_names[j][0]:
-                        different_names = False
-        return different_names
+                        identical_names = True
+        return identical_names
 
-    def check_empty_names():
-        nonempty_names = True
+    def are_empty_names():
+        empty_names = False
         nonlocal emails_and_names
         players_number = len(emails_and_names)
         if players_number == 0:
-            return False
+            empty_names = True
         for i in range(0, players_number):
             if emails_and_names[i][0] == "":
-                nonempty_names = False
-        return nonempty_names
+                empty_names = True
+        return empty_names
 
     def get_vals():
         '''gets emails from fields'''
@@ -251,21 +254,21 @@ def get_emails_form(players_number):
         emails_and_names = []
         for i in range(0, players_number):
             emails_and_names.append((entries[i*2].get(), entries[i * 2 + 1].get()))
-        different_names = check_different_names()
-        nonempty_names = check_empty_names()
+        identical_names = are_identical_names()
+        empty_names = are_empty_names()
 
-        if different_names and nonempty_names:
+        if not (identical_names or empty_names):
             pass
-        elif nonempty_names is False:
+        elif empty_names is True:
             text_label['text'] = "One or more names are empty"
-        elif different_names is False:
+        elif identical_names is True:
             text_label['text'] = "Two or more names are identical"
 
     done_button = Button(curr_window, fg="RED", height=2, width=20, text="Done", command=get_vals)
-    done_button.configure(background="red", foreground="white")
+    done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
     done_button.place(x=20, y=130+35*(MAX_ENTRIES+1))
 
-    while (not (check_empty_names() and check_different_names())) and window_open:
+    while (are_empty_names() or are_identical_names()) and window_open:
         pass
         #logger.log_debug("Window for emails and names was closed\n")
     WindowSingleton.reset_instance()
@@ -276,7 +279,7 @@ def show_info(curr_info):
     '''shows info, mostly for cop'''
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("Night Report For Cop")
-    screen_info = Text(curr_window)
+    screen_info = Text(curr_window, bg="white", fg=UMBER)
     screen_info.insert(INSERT, curr_info)
     screen_info.pack()
     done_was_clicked = False
@@ -284,8 +287,8 @@ def show_info(curr_info):
         nonlocal done_was_clicked
         done_was_clicked = True
         WindowSingleton.reset_instance()
-    done_button = Button(curr_window, fg="WHITE", background="RED", height=2, width=20,
-                         text="Done", command=done_click)
+    done_button = Button(curr_window, fg=ANTI_FLASH_WHITE, bg=SPICY_MIX,
+                         height=2, width=20, text="Done", command=done_click)
     done_button.pack()
     while (not done_was_clicked) and window_open:
         pass
@@ -298,7 +301,7 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
         pass
     player_window = WindowSingleton.get_instance().window
 
-    background_color = "black"
+    background_color = ANTI_FLASH_WHITE
     player_window.configure(background=background_color)
     player_window.title(player_message)
     logs_frame = Frame(player_window)
@@ -306,8 +309,8 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
         logs_frame.pack(side=LEFT)
     global log_history
     logs_label = Label(logs_frame, text=log_history, height=60, width=20,
-                       font=("bold", 10), background="blue", anchor=N)
-    logs_label.configure(background="purple", foreground="white")
+                       font=("bold", 10), background=LIGHT_MOSS_GREEN,
+                       foreground=ANTI_FLASH_WHITE, anchor=N)
     logs_label.pack(side=TOP)
 
     game_frame = Frame(player_window)
@@ -318,8 +321,8 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     title_frame.configure(background=background_color)
     title_frame.pack()
     text_label = Label(title_frame, text=player_message, width=40,
-                       font=("bold", 20), anchor="w", justify="center")
-    text_label.configure(background="red")
+                       font=("bold", 20), bg = UMBER, fg=ANTI_FLASH_WHITE,
+                       anchor="w", justify="center")
     text_label.pack()
 
     top_frame = Frame(game_frame)
@@ -337,9 +340,9 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
             curr_frame = top_frame
         else:
             curr_frame = bottom_frame
-        vote_button = Button(curr_frame, fg="black", background=COLORS[i % len(COLORS)],
-                             height=20, width=17, text=player_name,
-                             command=vote_function(player_name))
+        vote_button = Button(curr_frame, bg=SPICY_MIX,
+                             fg=ANTI_FLASH_WHITE, height=20, width=17,
+                             text=player_name, command=vote_function(player_name))
         vote_button.configure(font=("Courier", 10))
         vote_button.pack(side=LEFT)
     global just_voted

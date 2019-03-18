@@ -193,8 +193,6 @@ def get_names_form(input_players_number):
                 if i != j:
                     if str(player_names[i]) == str(player_names[j]):
                         identical_names = True
-        print(identical_names)
-        print(input_players_number)
         return identical_names
 
     def are_empty_names():

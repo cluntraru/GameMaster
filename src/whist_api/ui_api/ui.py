@@ -1,7 +1,7 @@
 """"Implementation of a whist ui"""
 from tkinter import Frame, Tk, Button, Text, LEFT, TOP, INSERT, Label, Entry
 from math import floor
-#import random
+import random
 import sys
 from threading import Thread, Lock
 import logger
@@ -247,7 +247,7 @@ def get_player_number_input(player_name, allowed_choices, input_type):
     background_color = ANTI_FLASH_WHITE
     foreground_color = UMBER
 
-    #return allowed_choices[random.randint(0, len(allowed_choices) - 1)]
+    return allowed_choices[random.randint(0, len(allowed_choices) - 1)]
 
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("Players number")
@@ -334,7 +334,10 @@ def show_scoreboard(player_names, target_round, scoreboard):
                            background="black", foreground="white")
         name_label.pack(side=LEFT)
 
-    for round_number in range(0, target_round + 1):
+    top_round = 0
+    if (target_round + 1) > 24:
+        top_round = (target_round + 1) - 24
+    for round_number in range(top_round, target_round + 1):
 
         round_frame = Frame(player_window, height=1, width=200)
         round_frame.pack(side=TOP)

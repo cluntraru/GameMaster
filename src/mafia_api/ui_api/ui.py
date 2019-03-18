@@ -1,5 +1,5 @@
 '''Ui of mafia storyteller'''
-from tkinter import Frame, Tk, Button, Text, LEFT, TOP, N, INSERT, Label, Entry
+from tkinter import Frame, Tk, Button, Text, Scrollbar, LEFT, TOP, RIGHT, END, INSERT, Label, Entry, Listbox
 from math import floor
 import sys
 from threading import Thread, Lock
@@ -18,7 +18,7 @@ saved_person = NOBODY
 mutilated_person = NOBODY
 mutilation_place = NOBODY
 chosen_game = NOBODY
-log_history = "GAME LOGS: "
+log_history = ["GAME LOGS: "]
 field_number = "-1"
 just_voted = False
 window_open = False
@@ -40,12 +40,14 @@ def to_int(curr_str):
 def add_to_log_history(new_logs):
     """adds to log window"""
     global log_history
-    log_history = log_history + "\n" + new_logs
+    log_history.append(new_logs)
+    log_history.append("\n")
 
 def reset_log_history():
     """empties log window"""
     global log_history
-    log_history = "GAME LOGS: "
+    log_history = []
+    log_history.append("GAME LOGS: ")
 
 
 def delete_children(window):
@@ -315,9 +317,13 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     if player_message != "Chose a game to play!":
         logs_frame.pack(side=LEFT)
     global log_history
-    logs_label = Label(logs_frame, text=log_history, height=60, width=20,
+    scrollbar = Scrollbar(player_window)
+    scrollbar.pack(side=RIGHT)
+    logs_label = Listbox(logs_frame, height=60, width=20,
                        font=("bold", 10), background=LIGHT_MOSS_GREEN,
-                       foreground=ANTI_FLASH_WHITE, anchor=N)
+                       foreground=ANTI_FLASH_WHITE, yscrollcommand=scrollbar.set)
+    for individual_log in log_history:
+        logs_label.insert(END, individual_log)
     logs_label.pack(side=TOP)
 
     game_frame = Frame(player_window)

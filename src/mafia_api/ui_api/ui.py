@@ -1,5 +1,6 @@
 '''Ui of mafia storyteller'''
-from tkinter import Frame, Tk, Button, Text, Scrollbar, LEFT, TOP, RIGHT, END, INSERT, Label, Entry, Listbox
+from tkinter import Frame, Tk, Button, Text, Scrollbar, LEFT, \
+    TOP, RIGHT, END, INSERT, Label, Entry, Listbox
 from math import floor
 import sys
 from threading import Thread, Lock
@@ -320,8 +321,8 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     scrollbar = Scrollbar(player_window)
     scrollbar.pack(side=RIGHT)
     logs_label = Listbox(logs_frame, height=60, width=20,
-                       font=("bold", 10), background=LIGHT_MOSS_GREEN,
-                       foreground=ANTI_FLASH_WHITE, yscrollcommand=scrollbar.set)
+                         font=("bold", 10), background=LIGHT_MOSS_GREEN,
+                         foreground=ANTI_FLASH_WHITE, yscrollcommand=scrollbar.set)
     for individual_log in log_history:
         logs_label.insert(END, individual_log)
     logs_label.pack(side=TOP)

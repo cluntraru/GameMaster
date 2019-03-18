@@ -247,7 +247,7 @@ def get_player_number_input(player_name, allowed_choices, input_type):
     background_color = ANTI_FLASH_WHITE
     foreground_color = UMBER
 
-    #return allowed_choices[random.randint(0, len(allowed_choices) - 1)]
+    return allowed_choices[random.randint(0, len(allowed_choices) - 1)]
 
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("Players number")

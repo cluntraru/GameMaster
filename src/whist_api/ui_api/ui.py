@@ -111,16 +111,16 @@ def get_players_number():
 
     title_text_label = Label(curr_window, text="Welcome to Whist", width=20, font=("bold", 30))
     #title_text_label.configure(anchor="n")
-    title_text_label.place(x=400, y=30, anchor="w")
+    title_text_label.place(x=480, y=30, anchor="w")
     title_text_label.configure(background=background_color, foreground=foreground_color)
 
     form_text_label = Label(curr_window, text="Insert number of players:",
-                            width=20, font=("bold", 10), anchor="w")
-    form_text_label.place(x=10, y=TITLE_SPACE)
+                            width=35, font=("bold", 10), anchor="w")
+    form_text_label.place(x=50, y=TITLE_SPACE)
     form_text_label.configure(background=background_color, foreground=foreground_color)
 
     number_entry = Entry(curr_window)
-    number_entry.place(x=20, width=20, y=TITLE_SPACE+FIELD_SPACE)
+    number_entry.place(x=55, width=30, y=TITLE_SPACE+FIELD_SPACE)
 
     def get_val():
         """gets number from field"""
@@ -134,7 +134,7 @@ def get_players_number():
 
     done_button = Button(curr_window, fg=ANTI_FLASH_WHITE, bg=SPICY_MIX,
                          height=0, width=20, text="Done", command=get_val)
-    done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
+    done_button.place(x=55, y=TITLE_SPACE+FIELD_SPACE * 2)
 
     while not (4 <= to_int(field_number) <= 6) and window_open:
         pass
@@ -163,7 +163,7 @@ def get_names_form(input_players_number):
     curr_window.configure(background=background_color)
     text_label = Label(curr_window, text="Insert players names",
                        width=40, font=("bold", 20), anchor="w")
-    text_label.place(x=380, y=53)
+    text_label.place(x=480, y=53)
     text_label.configure(background=background_color, foreground=foreground_color)
 
     entries = []
@@ -261,7 +261,7 @@ def get_player_number_input(player_name, allowed_choices, input_type):
     form_text_label = Label(curr_window, text=player_name + ", insert your " +
                             input_type + "." + "Possible choices: " + str(allowed_choices),
                             width=40, font=("bold", 10), anchor="w")
-    form_text_label.place(x=10, y=TITLE_SPACE)
+    form_text_label.place(x=20, y=TITLE_SPACE)
     form_text_label.configure(background=background_color, foreground=foreground_color)
 
     #number_frame = Frame(curr_window)

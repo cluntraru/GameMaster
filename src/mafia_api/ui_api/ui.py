@@ -405,14 +405,8 @@ def day_vote(players_can_vote, votable_players):
     for player_name in votable_players:
         player_votes[player_name] = 0
     player_votes[NOBODY] = 0
-    reset_at_beggining = True
-    reset_at_end = True
     for i in range(0, len(players_can_vote)):
-        if i == 0:
-            reset_at_beggining = True
-        else:
-            reset_at_beggining = False
-
+        reset_at_beggining = bool(i == 0)
         reset_at_end = bool(i == (len(players_can_vote) - 1))
         player_name = players_can_vote[i]
         curr_player = player_name
@@ -544,7 +538,8 @@ def night_mutilator_vote(player_names):
     if mutilated_person != NOBODY:
         curr_window = WindowSingleton.get_instance().window
         curr_window.title("NIGHT PHASE: " + "Mutilator mutilates: ")
-        create_voting_screen(["Hand", "Mouth"], mutilator_place_function)
+        create_voting_screen(["Hand", "Mouth"], mutilator_place_function,
+                             player_message=player_message)
 
     logger.log_debug("Mutilator targeted " + mutilated_person)
     return (mutilated_person, mutilation_place)

@@ -287,10 +287,11 @@ def play_night(cycle_count):
 
     patient = doctor_night(doctor_turn)
     pause_between_roles()
-
+    print(mutilated)
+    print(mutilated_area)
     if patient and patient == mutilated:
         mutilated = None
-    elif not patient and mutilated and mutilated_area == 'H':
+    elif not patient == mutilated and mutilated and mutilated_area == 'H':
         player_data[mutilated].set_can_vote(False)
 
     if patient and patient == assassinated:

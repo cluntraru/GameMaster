@@ -1,4 +1,4 @@
-""""Implementation of a whist ui"""
+""""Ui for whist"""
 from tkinter import Frame, Tk, Button, Text, LEFT, TOP, INSERT, Label, Entry
 from math import floor
 import random
@@ -45,7 +45,7 @@ class WindowSingleton:
     __instance = None
     @staticmethod
     def get_instance():
-        """ Static access method. """
+        """ Method for getting singleton instance """
         get_instance_guard.acquire()
         if WindowSingleton.__instance is None:
             WindowSingleton()
@@ -53,7 +53,7 @@ class WindowSingleton:
         return WindowSingleton.__instance
     @staticmethod
     def reset_instance():
-        """Static use and destroy method"""
+        """Static method for resetting the current window"""
         window = WindowSingleton.__instance.window
         delete_children(window)
     @staticmethod
@@ -66,7 +66,7 @@ class WindowSingleton:
         destroy_instance_guard.release()
 
     def __init__(self):
-        """ Virtually private constructor. """
+        """ private constructor. """
         if WindowSingleton.__instance is not None:
             pass
         else:
@@ -241,7 +241,7 @@ def get_names_form(input_players_number):
 
 
 def get_player_number_input(player_name, allowed_choices, input_type):
-    """Functin used when the player has to insert a bid or result"""
+    """Function used when the player has to insert a bid or result"""
     global field_number
     field_number = -1
     background_color = ANTI_FLASH_WHITE
@@ -293,27 +293,6 @@ def get_player_number_input(player_name, allowed_choices, input_type):
         pass
     WindowSingleton.reset_instance()
     return int(field_number)
-
-
-def show_info(curr_info):
-    '''shows info, mostly for cop'''
-    curr_window = WindowSingleton.get_instance().window
-    curr_window.title("Night Report For Cop")
-    screen_info = Text(curr_window)
-    screen_info.insert(INSERT, curr_info)
-    screen_info.pack()
-    done_was_clicked = False
-    def done_click():
-        nonlocal done_was_clicked
-        done_was_clicked = True
-        WindowSingleton.reset_instance()
-    done_button = Button(curr_window, fg="WHITE", background="RED", height=2, width=20,
-                         text="Done", command=done_click)
-    done_button.pack()
-    while (not done_was_clicked) and window_open:
-        pass
-    logger.log_debug("Info window closed")
-
 
 def show_scoreboard(player_names, target_round, scoreboard):
     """Shows scoreboard in window"""

@@ -19,15 +19,20 @@ saved_person = NOBODY
 mutilated_person = NOBODY
 mutilation_place = NOBODY
 chosen_game = NOBODY
+title_label_refrence = NOBODY
 log_history = ["GAME LOGS: "]
 field_number = "-1"
+
 just_voted = False
 window_open = False
+
 
 ANTI_FLASH_WHITE = "#F0F2EF"
 UMBER = "#5C5346"
 SPICY_MIX = "#8C6057"
 LIGHT_MOSS_GREEN = "#AFD5AA"
+BROWN = "#281706"
+LOG_SIZE = 40
 
 
 def to_int(curr_str):
@@ -41,7 +46,18 @@ def to_int(curr_str):
 def add_to_log_history(new_logs):
     """adds to log window"""
     global log_history
-    log_history.append(new_logs)
+    if len(new_logs) <= 1:
+        log_history.append("\n")
+        return
+    if new_logs[0] == '-':
+        log_history.append(new_logs)
+    else:
+        for i in range(0, 1000):
+            left_index = i * LOG_SIZE
+            right_index = min(len(new_logs), (i + 1) * LOG_SIZE)
+            log_history.append(new_logs[left_index:right_index])
+            if right_index == len(new_logs):
+                break
     log_history.append("\n")
 
 def reset_log_history():
@@ -67,7 +83,7 @@ class WindowSingleton:
     __instance = None
     @staticmethod
     def get_instance():
-        """ Static access method. """
+        """ Mwthod for getting singleton instance """
         GET_INSTANCE_GUARD.acquire()
         if WindowSingleton.__instance is None:
             WindowSingleton()
@@ -75,12 +91,12 @@ class WindowSingleton:
         return WindowSingleton.__instance
     @staticmethod
     def reset_instance():
-        """Static method for reseting window method"""
+        """Static method for resetting window method"""
         window = WindowSingleton.__instance.window
         delete_children(window)
     @staticmethod
     def destroy_instance():
-        """Static method for destroying window"""
+        """Static method for destroying the window"""
         DESTROY_INSTANCE_GUARD.acquire()
         if WindowSingleton.__instance is not None:
             WindowSingleton.__instance.window.destroy()
@@ -147,16 +163,16 @@ def get_players_number():
 
     title_text_label = Label(curr_window, text="Welcome to Mafia", width=20, font=("bold", 30))
     #title_text_label.configure(anchor="n")
-    title_text_label.place(x=400, y=30, anchor="w")
+    title_text_label.place(x=480, y=30, anchor="w")
     title_text_label.configure(background=background_color, foreground=foreground_color)
 
     form_text_label = Label(curr_window, text="Insert number of players, between 4 and 21:",
                             width=35, font=("bold", 10), anchor="w")
-    form_text_label.place(x=10, y=TITLE_SPACE)
+    form_text_label.place(x=50, y=TITLE_SPACE)
     form_text_label.configure(background=background_color, foreground=foreground_color)
 
     number_entry = Entry(curr_window)
-    number_entry.place(x=20, width=20, y=TITLE_SPACE+FIELD_SPACE)
+    number_entry.place(x=55, width=30, y=TITLE_SPACE+FIELD_SPACE)
 
     def get_val():
         """gets number from field"""
@@ -167,7 +183,7 @@ def get_players_number():
             form_text_label['text'] = "Ilegal number of players"
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done", command=get_val)
-    done_button.place(x=20, y=TITLE_SPACE+FIELD_SPACE * 2)
+    done_button.place(x=55, y=TITLE_SPACE+FIELD_SPACE * 2)
     done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
 
     while (not 4 < to_int(field_number) <= 20) and window_open:
@@ -197,7 +213,7 @@ def get_emails_form(arg_players_number):
     curr_window.configure(background=background_color)
     text_label = Label(curr_window, text="Insert players emails and names",
                        width=40, font=("bold", 20), anchor="w")
-    text_label.place(x=380, y=53)
+    text_label.place(x=480, y=53)
     text_label.configure(background=background_color, foreground=foreground_color)
 
     entries = []
@@ -231,6 +247,7 @@ def get_emails_form(arg_players_number):
     logger.log_debug("Created email fields")
 
     def are_identical_names():
+        '''checks if there are identical names in the form'''
         identical_names = False
         nonlocal emails_and_names
         players_number = len(emails_and_names)
@@ -245,6 +262,7 @@ def get_emails_form(arg_players_number):
         return identical_names
 
     def are_empty_names():
+        '''checks if there are empty names in the form'''
         empty_names = False
         nonlocal emails_and_names
         players_number = len(emails_and_names)
@@ -285,8 +303,8 @@ def get_emails_form(arg_players_number):
     return emails_and_names
 
 
-def show_info(curr_info):
-    '''shows info, mostly for cop'''
+def show_answer(curr_info):
+    '''shows query answer for cop'''
     curr_window = WindowSingleton.get_instance().window
     curr_window.title("Night Report For Cop")
     screen_info = Text(curr_window, bg="white", fg=UMBER)
@@ -294,6 +312,7 @@ def show_info(curr_info):
     screen_info.pack()
     done_was_clicked = False
     def done_click():
+        '''resets window after done is clicked'''
         nonlocal done_was_clicked
         done_was_clicked = True
         WindowSingleton.reset_instance()
@@ -304,24 +323,35 @@ def show_info(curr_info):
         pass
     logger.log_debug("Info window closed")
 
-def create_voting_screen(player_names, vote_function, player_message="Time to vote"):
-    '''screen populating function'''
-    global window_open
+def create_voting_screen(player_names, vote_function,
+                         player_message="Time to vote", reset_at_beggining=True, reset_at_end=True):
+    '''voting screen populating function'''
+    global window_open, just_voted, title_label_refrence, log_history
     while window_open is False:
         pass
-    player_window = WindowSingleton.get_instance().window
 
+    player_window = WindowSingleton.get_instance().window
+    if reset_at_beggining is False:
+        just_voted = False
+        player_window.title(player_message)
+        title_label_refrence.configure(text=player_message)
+        while (not just_voted) and window_open:
+            pass
+        if reset_at_end is True:
+            WindowSingleton.reset_instance()
+        return
+    WindowSingleton.reset_instance()
     background_color = ANTI_FLASH_WHITE
     player_window.configure(background=background_color)
     player_window.title(player_message)
     logs_frame = Frame(player_window)
     if player_message != "Chose a game to play!":
         logs_frame.pack(side=LEFT)
-    global log_history
+
     scrollbar = Scrollbar(player_window)
     scrollbar.pack(side=RIGHT)
-    logs_label = Listbox(logs_frame, height=60, width=20,
-                         font=("bold", 10), background=LIGHT_MOSS_GREEN,
+    logs_label = Listbox(logs_frame, height=60, width=30,
+                         font=("bold", 10), background=BROWN,
                          foreground=ANTI_FLASH_WHITE, yscrollcommand=scrollbar.set)
     for individual_log in log_history:
         logs_label.insert(END, individual_log)
@@ -337,6 +367,7 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     text_label = Label(title_frame, text=player_message, width=40,
                        font=("bold", 20), bg=UMBER, fg=ANTI_FLASH_WHITE,
                        anchor="w", justify="center")
+    title_label_refrence = text_label
     text_label.pack()
 
     top_frame = Frame(game_frame)
@@ -354,26 +385,36 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
             curr_frame = top_frame
         else:
             curr_frame = bottom_frame
-        vote_button = Button(curr_frame, bg=SPICY_MIX,
+        vote_button = Button(curr_frame, bg=SPICY_MIX, font=("Courier", 10),
                              fg=ANTI_FLASH_WHITE, height=20, width=17,
                              text=player_name, command=vote_function(player_name))
-        vote_button.configure(font=("Courier", 10))
         vote_button.pack(side=LEFT)
-    global just_voted
+
     just_voted = False
     while (not just_voted) and window_open:
         pass
-    WindowSingleton.reset_instance()
+
+    if reset_at_end is True:
+        WindowSingleton.reset_instance()
     #logger.log_debug("Voting screen closed")
 
 
 def day_vote(players_can_vote, votable_players):
-    '''day vote'''
+    '''creates screen for day vote'''
     player_votes = {}
     for player_name in votable_players:
         player_votes[player_name] = 0
     player_votes[NOBODY] = 0
-    for player_name in players_can_vote:
+    reset_at_beggining = True
+    reset_at_end = True
+    for i in range(0, len(players_can_vote)):
+        if i == 0:
+            reset_at_beggining = True
+        else:
+            reset_at_beggining = False
+
+        reset_at_end = bool(i == (len(players_can_vote) - 1))
+        player_name = players_can_vote[i]
         curr_player = player_name
         player_message = "DAY PHASE: " + curr_player + " votes "
 
@@ -385,7 +426,8 @@ def day_vote(players_can_vote, votable_players):
             return callback
 
         create_voting_screen(votable_players, day_vote_function,
-                             player_message=player_message)
+                             player_message=player_message,
+                             reset_at_beggining=reset_at_beggining, reset_at_end=reset_at_end)
 
     hanged_player = NOBODY
     for player_name in votable_players:
@@ -395,41 +437,16 @@ def day_vote(players_can_vote, votable_players):
     return hanged_player
 
 
-def game_choice(games_list):
-    '''assassin vote'''
-    global chosen_game
-    chosen_game = NOBODY
-    player_message = "Chose a game to play!"
-
-    def game_choice_function(selected_game):
-        '''assassin vote'''
-        def callback():
-            '''callback'''
-            global chosen_game
-            chosen_game = selected_game
-            global just_voted
-            just_voted = True
-
-        return callback
-
-    create_voting_screen(games_list, game_choice_function,
-                         player_message=player_message)
-
-    logger.log_debug("Chosen game was " + chosen_game)
-    WindowSingleton.destroy_instance()
-    return chosen_game
-
-
 def night_assassin_vote(town_names):
-    '''assassin vote'''
+    '''creates window for assassin vote'''
     global assassinated_person
     assassinated_person = NOBODY
     player_message = "NIGHT PHASE: Assassins kill: "
 
     def assassin_vote_function(player_name):
-        '''assassin vote'''
+        '''returns the function that gets the assassinated person'''
         def callback():
-            '''callback'''
+            '''function that gets the assassinated person'''
             global assassinated_person
             assassinated_person = player_name
             global just_voted
@@ -445,15 +462,15 @@ def night_assassin_vote(town_names):
 
 
 def night_cop_vote(player_names):
-    '''cop vote'''
+    '''creates window for cop vote'''
     global checked_person
     checked_person = NOBODY
     player_message = "NIGHT PHASE: Cop checks: "
 
     def cop_vote_function(player_name):
-        '''cop vote'''
+        '''returns function that gets the assassinated person'''
         def callback():
-            '''callback'''
+            '''function that gets the checked person'''
             global checked_person
             checked_person = player_name
             global just_voted
@@ -469,15 +486,15 @@ def night_cop_vote(player_names):
 
 
 def night_doctor_vote(player_names):
-    '''doctor vote'''
+    '''creates window for doctor vote'''
     global saved_person
     saved_person = NOBODY
     player_message = "NIGHT PHASE: Doctor saves: "
 
     def doctor_vote_function(player_name):
-        '''doctor vote'''
+        '''returns the function that gets the saved person'''
         def callback():
-            '''callback'''
+            '''function that gets the saved person'''
             global saved_person
             saved_person = player_name
             global just_voted
@@ -493,14 +510,15 @@ def night_doctor_vote(player_names):
 
 
 def night_mutilator_vote(player_names):
-    '''mutilator vote'''
+    '''creates 2 screens for mutilator vote: one for choosing the player,
+    the other for choosing the mutilation place'''
     global mutilated_person, mutilation_place
     mutilated_person = NOBODY
     mutilation_place = NOBODY
     def mutilator_vote_function(player_name):
-        '''mutilator vote'''
+        '''returns function that gets the mutilated person'''
         def callback():
-            '''callback'''
+            '''function that gets the mutilated person'''
             global mutilated_person
             mutilated_person = player_name
             global just_voted
@@ -509,7 +527,9 @@ def night_mutilator_vote(player_names):
         return callback
 
     def mutilator_place_function(place_name):
+        '''returns function that gets the mutilation place'''
         def callback():
+            '''function that gets the mutilation place'''
             global mutilation_place
             mutilation_place = place_name[0]
             global just_voted
@@ -528,9 +548,3 @@ def night_mutilator_vote(player_names):
 
     logger.log_debug("Mutilator targeted " + mutilated_person)
     return (mutilated_person, mutilation_place)
-
-#lista = ["Marcel", "Ionela", "Trump", "Putin", "Altcineva"]
-#lista.extend(lista)
-#lista.append("DA")
-# players_number=get_players_number()
-#show_info("hello")

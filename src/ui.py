@@ -16,7 +16,7 @@ SPICY_MIX = "#8C6057"
 LIGHT_MOSS_GREEN = "#AFD5AA"
 
 def create_voting_screen(player_names, vote_function, player_message="Time to vote"):
-    '''screen populating function'''
+    '''Creates a window in which the player can vote'''
     player_window = Tk()
     width_value = player_window.winfo_screenwidth()
     height_value = player_window.winfo_screenheight()
@@ -61,15 +61,15 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
     #logger.log_debug("Voting screen closed")
 
 def game_choice(games_list):
-    '''Game choice'''
+    '''Creates a window in which the player can choose the game he wants to play'''
     global chosen_game
     chosen_game = NOBODY
     player_message = "Chose a game to play!"
 
     def game_choice_function(player_window, selected_game):
-        '''assassin vote'''
+        '''returns the function called when the player chooses a game'''
         def callback():
-            '''callback'''
+            '''function called when the player chooses a game'''
             global chosen_game
             chosen_game = selected_game
             global just_voted

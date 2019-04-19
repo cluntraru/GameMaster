@@ -1,7 +1,6 @@
 """"Ui for whist"""
-from tkinter import Frame, Tk, Button, Text, LEFT, TOP, INSERT, Label, Entry
+from tkinter import Frame, Tk, Button, LEFT, TOP, Label, Entry
 from math import floor
-import random
 import sys
 from threading import Thread, Lock
 import logger

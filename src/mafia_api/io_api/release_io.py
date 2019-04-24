@@ -5,9 +5,11 @@ import mafia_api.ui_api.ui as ui
 import mafia_api.email_api.gm_email as email
 
 def add_logs(text):
+    '''Sends logs to ui'''
     ui.add_to_log_history(text)
 
 def reset_logs():
+    '''Resets logs in ui'''
     ui.reset_logs()
 
 def get_player_cnt():
@@ -69,3 +71,8 @@ def get_mutilator_target(targets):
 def get_doctor_target(targets):
     ''' UI prompts for doctor target and returns their name. '''
     return ui.night_doctor_vote(targets)
+
+def show_game_logs(player_data):
+    '''UI prompts to show logs at the end of the game'''
+    ui.show_game_logs(player_data)
+	

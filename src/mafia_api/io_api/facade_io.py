@@ -16,12 +16,14 @@ import logger
 SPEAKER = None
 
 def add_logs(text):
+    '''Adds logs in ui'''
     if logger.is_debug_mode():
         print(text)
     else:
         rlio.add_logs(text)
 
 def reset_logs():
+    '''Resets logs in ui'''
     if logger.is_debug_mode():
         print("Logs reseted\n")
     else:
@@ -113,54 +115,71 @@ def output(text):
     otherwise. '''
     if logger.is_speak_mode():
         _speak(text)
-        logger.log_info(text)
+        #logger.log_info(text)
     else:
         logger.log_info(text)
 
 
 def show_player(player_name, player_data):
-    ''' Prints the role and status (dead/alive) of a player. '''
+    ''' Returns logs of the role and status (dead/alive) of a player. '''
     if player_data[player_name].get_alive():
         status = 'ALIVE'
     else:
         status = 'DEAD'
 
-    logger.log_info(player_name + ' the ' +\
+    return str(player_name + ' the ' +\
                   player_data[player_name].get_role_name() + ' - ' + status)
 
 
 def show_mafia(player_data):
-    ''' Prints all members of the mafia. '''
-    logger.log_info('Mafia:')
+    ''' Returns logs of all members of the mafia. '''
+    curr_logs = ''
+    curr_logs = curr_logs + 'Mafia: \n'
     for player_name in player_data:
         if player_data[player_name].get_role_idx() != Player.ASSN_IDX:
             continue
 
-        show_player(player_name, player_data)
+        curr_logs += show_player(player_name, player_data) + '\n'
 
-    logger.log_info('\n')
+    curr_logs += '\n'
+    return curr_logs
 
 
 def show_town(player_data):
-    ''' Prints all members of the town. '''
-    logger.log_info('Town:')
+    ''' Returns logs of all members of the town. '''
+    curr_logs = ''
+    curr_logs += 'Town: \n'
     for player_name in player_data:
         if player_data[player_name].get_role_idx() == Player.ASSN_IDX or\
            player_data[player_name].get_role_idx() == Player.SUICD_IDX:
 
             continue
 
-        show_player(player_name, player_data)
+        curr_logs += show_player(player_name, player_data) + '\n'
 
-    logger.log_info('\n')
+    curr_logs += '\n'
+    return curr_logs
 
 
 def show_suicidal(player_data):
-    ''' Prints the suicidal person. '''
-    logger.log_info('Neutral:')
+    ''' Returns logs of the suicidal person. '''
+    curr_logs = ''
+    curr_logs += 'Neutral: \n'
     for player_name in player_data:
         if player_data[player_name].get_role_idx() == Player.SUICD_IDX:
-            show_player(player_name, player_data)
+            curr_logs += show_player(player_name, player_data) + '\n'
             break
 
-    logger.log_info('\n')
+    curr_logs += '\n'
+    return curr_logs
+
+def show_results(result, player_data):
+    '''Gets all the game logs and shows them'''
+    game_logs = result + '\n\n'
+    game_logs += show_mafia(player_data)
+    game_logs += show_town(player_data)
+    game_logs += show_suicidal(player_data)
+    if logger.is_debug_mode():
+        logger.log_info(game_logs)
+    else:
+        rlio.show_game_logs(game_logs)

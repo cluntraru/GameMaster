@@ -341,19 +341,19 @@ def log_results():
     ''' Prints the scoreboard. '''
     #logger.log_info('---------- RESULTS ----------')
     io.add_logs('-------------------- RESULTS --------------------')
+    result = ""
     if suicidal_won():
-        io.output("The suicidal person won!\n")
+        result = "The suicidal person won!"
 
     if mafia_won():
-        io.output("The mafia won!\n")
+        result = "The mafia won!"
 
     if town_won():
-        io.output("The town won!\n")
-
+        result = "The town won!"
+    io.output(result)
     logger.log_info('\n')
-    io.show_mafia(player_data)
-    io.show_town(player_data)
-    io.show_suicidal(player_data)
+    io.show_results(result, player_data)
+
 
 
 def start():

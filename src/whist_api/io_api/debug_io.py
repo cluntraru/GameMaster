@@ -2,6 +2,7 @@
 import logger
 
 def _to_int(curr_str):
+    '''Tries to turn a string to int, returns -1 if not possible'''
     try:
         return int(curr_str)
     except ValueError:

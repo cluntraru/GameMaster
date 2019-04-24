@@ -543,3 +543,44 @@ def night_mutilator_vote(player_names):
 
     logger.log_debug("Mutilator targeted " + mutilated_person)
     return (mutilated_person, mutilation_place)
+
+def show_game_logs(player_data):
+    '''Creates window with logs at the end of the game'''
+    background_color = ANTI_FLASH_WHITE
+    foreground_color = UMBER
+
+    curr_window = WindowSingleton.get_instance().window
+
+    if window_open is False:
+        raise IOError
+
+    # curr_window.geometry('500x500')
+    curr_window.title("Game results")
+    curr_window.configure(background=background_color)
+
+    title_text_label = Label(curr_window, text="Game results", width=20, font=("bold", 30))
+    # title_text_label.configure(anchor="n")
+    screen_width = curr_window.winfo_screenwidth()
+    screen_height = curr_window.winfo_screenheight()
+    title_text_label.place(x=screen_width / 3, y=30, anchor="w")
+    title_text_label.configure(background=background_color, foreground=foreground_color,
+                               justify="left")
+
+    lines_nr = 2 * len(player_data.split('\n'))
+
+    form_text_label = Label(curr_window, text=player_data,
+                            width=100, height=lines_nr, font=("bold", 10), anchor="w")
+    form_text_label.place(x=screen_width / 2.5, y=screen_height/8)
+    form_text_label.configure(background=background_color, foreground=foreground_color,
+                              justify="left")
+
+    def destroy_window():
+        """Closes the tkinter window"""
+        WindowSingleton.destroy_instance()
+
+    done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done",
+                         command=destroy_window)
+    done_button.place(x=screen_width / 2.5, y=screen_height/2 + lines_nr * 3)
+    done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
+#start_window_thread()
+#show_game_logs("m\np\n\nt\np\np\np\n\ns\np\n")

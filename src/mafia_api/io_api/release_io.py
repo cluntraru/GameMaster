@@ -10,7 +10,7 @@ def add_logs(text):
 
 def reset_logs():
     '''Resets logs in ui'''
-    ui.reset_logs()
+    ui.reset_log_history()
 
 def get_player_cnt():
     ''' UI prompts for number of players and returns the result. '''

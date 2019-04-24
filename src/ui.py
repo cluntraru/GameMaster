@@ -15,6 +15,7 @@ UMBER = "#5C5346"
 SPICY_MIX = "#8C6057"
 LIGHT_MOSS_GREEN = "#AFD5AA"
 
+
 def create_voting_screen(player_names, vote_function, player_message="Time to vote"):
     '''Creates a window in which the player can vote'''
     player_window = Tk()

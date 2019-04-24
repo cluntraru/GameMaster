@@ -75,4 +75,3 @@ def get_doctor_target(targets):
 def show_game_logs(player_data):
     '''UI prompts to show logs at the end of the game'''
     ui.show_game_logs(player_data)
-	

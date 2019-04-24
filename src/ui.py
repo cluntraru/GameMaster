@@ -70,9 +70,8 @@ def game_choice(games_list):
         '''returns the function called when the player chooses a game'''
         def callback():
             '''function called when the player chooses a game'''
-            global chosen_game
+            global chosen_game, just_voted
             chosen_game = selected_game
-            global just_voted
             just_voted = True
             player_window.destroy()
 

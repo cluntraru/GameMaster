@@ -103,8 +103,8 @@ class GameState:
             self._card_cnt -= 1
 
         self._update_scoreboard(self._round)
-        io.show_scoreboard(self._player_cnt, self._names, self._round,\
-                           self._scoreboard, self._point_diff)
+        io.show_scoreboard(self._names, self._round,\
+                           self._scoreboard)
 
         self._round += 1
 

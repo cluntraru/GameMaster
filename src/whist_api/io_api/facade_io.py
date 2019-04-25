@@ -35,9 +35,9 @@ def get_result(name, possible_results):
     return rlio.get_result(name, possible_results)
 
 
-def show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs):
+def show_scoreboard(player_names, target_round, scoreboard):
     ''' Shows players the scoreboard.  '''
     if logger.is_debug_mode():
-        dbgio.show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs)
+        dbgio.show_scoreboard(player_names, target_round, scoreboard)
     else:
-        rlio.show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs)
+        rlio.show_scoreboard(player_names, target_round, scoreboard)

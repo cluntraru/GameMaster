@@ -21,6 +21,6 @@ def get_result(name, possible_results):
     return ui.get_player_number_input(name, possible_results, "result")
 
 
-def show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs):
+def show_scoreboard(player_names, target_round, scoreboard):
     '''Prompts window to show scoreboard'''
     ui.show_scoreboard(player_names, target_round, scoreboard)

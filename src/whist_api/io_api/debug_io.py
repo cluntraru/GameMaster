@@ -46,7 +46,7 @@ def get_result(name, possible_results):
     return result
 
 
-def show_scoreboard(player_cnt, player_names, target_round, scoreboard, diffs):
+def show_scoreboard(player_names, target_round, scoreboard):
     ''' Prints scoreboard in console. '''
     logger.log_info('\nScoreboard - Round ' + str(target_round + 1))
     logger.log_info(player_names)

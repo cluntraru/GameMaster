@@ -36,19 +36,18 @@ def delete_children(window):
         item.destroy()
 
 
-get_instance_guard = Lock()
-destroy_instance_guard = Lock()
-
 class WindowSingleton:
     '''Singleton for window'''
     __instance = None
+    get_instance_guard = Lock()
+    destroy_instance_guard = Lock()
     @staticmethod
     def get_instance():
         """ Method for getting singleton instance """
-        get_instance_guard.acquire()
+        WindowSingleton.get_instance_guard.acquire()
         if WindowSingleton.__instance is None:
             WindowSingleton()
-        get_instance_guard.release()
+        WindowSingleton.get_instance_guard.release()
         return WindowSingleton.__instance
     @staticmethod
     def reset_instance():
@@ -58,11 +57,11 @@ class WindowSingleton:
     @staticmethod
     def destroy_instance():
         """Destroys the current window"""
-        destroy_instance_guard.acquire()
+        WindowSingleton.destroy_instance_guard.acquire()
         if WindowSingleton.__instance is not None:
             WindowSingleton.__instance.window.destroy()
             WindowSingleton.__instance = None
-        destroy_instance_guard.release()
+        WindowSingleton.destroy_instance_guard.release()
 
     def __init__(self):
         """ private constructor. """

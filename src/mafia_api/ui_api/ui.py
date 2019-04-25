@@ -13,13 +13,7 @@ FIELD_SPACE = 40
 TITLE_SPACE = 200
 
 
-assassinated_person = NOBODY
-checked_person = NOBODY
-saved_person = NOBODY
-mutilated_person = NOBODY
-mutilation_place = NOBODY
-chosen_game = NOBODY
-title_label_refrence = NOBODY
+title_label_refernce = NOBODY
 log_history = ["GAME LOGS: "]
 field_number = "-1"
 
@@ -75,19 +69,20 @@ def delete_children(window):
         item.destroy()
 
 
-GET_INSTANCE_GUARD = Lock()
-DESTROY_INSTANCE_GUARD = Lock()
+
 
 class WindowSingleton:
     '''Singleton for window'''
     __instance = None
+    GET_INSTANCE_GUARD = Lock()
+    DESTROY_INSTANCE_GUARD = Lock()
     @staticmethod
     def get_instance():
         """ Mwthod for getting singleton instance """
-        GET_INSTANCE_GUARD.acquire()
+        WindowSingleton.GET_INSTANCE_GUARD.acquire()
         if WindowSingleton.__instance is None:
             WindowSingleton()
-        GET_INSTANCE_GUARD.release()
+        WindowSingleton.GET_INSTANCE_GUARD.release()
         return WindowSingleton.__instance
     @staticmethod
     def reset_instance():
@@ -97,11 +92,11 @@ class WindowSingleton:
     @staticmethod
     def destroy_instance():
         """Static method for destroying the window"""
-        DESTROY_INSTANCE_GUARD.acquire()
+        WindowSingleton.DESTROY_INSTANCE_GUARD.acquire()
         if WindowSingleton.__instance is not None:
             WindowSingleton.__instance.window.destroy()
             WindowSingleton.__instance = None
-        DESTROY_INSTANCE_GUARD.release()
+        WindowSingleton.DESTROY_INSTANCE_GUARD.release()
 
     def __init__(self):
         """ Virtually private constructor. """
@@ -132,18 +127,6 @@ def start_window_thread():
     window_thread.start()
     while window_open is False:
         pass
-
-
-def close_window():
-    """Closes the window if it is open"""
-    global window_open
-    while window_open is False:
-        pass
-    if window_open is True:
-        WindowSingleton.destroy_instance()
-        window_open = False
-    return window_open
-
 
 def get_players_number():
     '''gets players number'''
@@ -326,7 +309,7 @@ def show_answer(curr_info):
 def create_voting_screen(player_names, vote_function,
                          player_message="Time to vote", reset_at_beggining=True, reset_at_end=True):
     '''voting screen populating function'''
-    global window_open, just_voted, title_label_refrence, log_history
+    global just_voted, title_label_refernce
     while window_open is False:
         pass
 
@@ -334,7 +317,7 @@ def create_voting_screen(player_names, vote_function,
     if reset_at_beggining is False:
         just_voted = False
         player_window.title(player_message)
-        title_label_refrence.configure(text=player_message)
+        title_label_refernce.configure(text=player_message)
         while (not just_voted) and window_open:
             pass
         if reset_at_end is True:
@@ -367,7 +350,7 @@ def create_voting_screen(player_names, vote_function,
     text_label = Label(title_frame, text=player_message, width=40,
                        font=("bold", 20), bg=UMBER, fg=ANTI_FLASH_WHITE,
                        anchor="w", justify="center")
-    title_label_refrence = text_label
+    title_label_refernce = text_label
     text_label.pack()
 
     top_frame = Frame(game_frame)
@@ -433,7 +416,6 @@ def day_vote(players_can_vote, votable_players):
 
 def night_assassin_vote(town_names):
     '''creates window for assassin vote'''
-    global assassinated_person
     assassinated_person = NOBODY
     player_message = "NIGHT PHASE: Assassins kill: "
 
@@ -441,7 +423,7 @@ def night_assassin_vote(town_names):
         '''returns the function that gets the assassinated person'''
         def callback():
             '''function that gets the assassinated person'''
-            global assassinated_person
+            nonlocal assassinated_person
             assassinated_person = player_name
             global just_voted
             just_voted = True
@@ -457,7 +439,6 @@ def night_assassin_vote(town_names):
 
 def night_cop_vote(player_names):
     '''creates window for cop vote'''
-    global checked_person
     checked_person = NOBODY
     player_message = "NIGHT PHASE: Cop checks: "
 
@@ -465,7 +446,7 @@ def night_cop_vote(player_names):
         '''returns function that gets the assassinated person'''
         def callback():
             '''function that gets the checked person'''
-            global checked_person
+            nonlocal checked_person
             checked_person = player_name
             global just_voted
             just_voted = True
@@ -481,7 +462,6 @@ def night_cop_vote(player_names):
 
 def night_doctor_vote(player_names):
     '''creates window for doctor vote'''
-    global saved_person
     saved_person = NOBODY
     player_message = "NIGHT PHASE: Doctor saves: "
 
@@ -489,7 +469,7 @@ def night_doctor_vote(player_names):
         '''returns the function that gets the saved person'''
         def callback():
             '''function that gets the saved person'''
-            global saved_person
+            nonlocal saved_person
             saved_person = player_name
             global just_voted
             just_voted = True
@@ -506,14 +486,13 @@ def night_doctor_vote(player_names):
 def night_mutilator_vote(player_names):
     '''creates 2 screens for mutilator vote: one for choosing the player,
     the other for choosing the mutilation place'''
-    global mutilated_person, mutilation_place
     mutilated_person = NOBODY
     mutilation_place = NOBODY
     def mutilator_vote_function(player_name):
         '''returns function that gets the mutilated person'''
         def callback():
             '''function that gets the mutilated person'''
-            global mutilated_person
+            nonlocal mutilated_person
             mutilated_person = player_name
             global just_voted
             just_voted = True
@@ -524,7 +503,7 @@ def night_mutilator_vote(player_names):
         '''returns function that gets the mutilation place'''
         def callback():
             '''function that gets the mutilation place'''
-            global mutilation_place
+            nonlocal mutilation_place
             mutilation_place = place_name[0]
             global just_voted
             just_voted = True

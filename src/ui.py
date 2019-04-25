@@ -7,7 +7,6 @@ MAX_ENTRIES = 10
 LEFT_SHIFT = 160
 FIELD_SPACE = 40
 TITLE_SPACE = 200
-chosen_game = NOBODY
 just_voted = False
 
 ANTI_FLASH_WHITE = "#F0F2EF"
@@ -63,7 +62,6 @@ def create_voting_screen(player_names, vote_function, player_message="Time to vo
 
 def game_choice(games_list):
     '''Creates a window in which the player can choose the game he wants to play'''
-    global chosen_game
     chosen_game = NOBODY
     player_message = "Chose a game to play!"
 
@@ -71,7 +69,8 @@ def game_choice(games_list):
         '''returns the function called when the player chooses a game'''
         def callback():
             '''function called when the player chooses a game'''
-            global chosen_game, just_voted
+            global just_voted
+            nonlocal chosen_game
             chosen_game = selected_game
             just_voted = True
             player_window.destroy()

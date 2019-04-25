@@ -559,7 +559,7 @@ def show_game_logs(player_data):
 
     done_button = Button(curr_window, fg="RED", height=0, width=20, text="Done",
                          command=destroy_window)
-    done_button.place(x=screen_width / 2.5, y=screen_height/2 + lines_nr * 3)
+    done_button.place(x=screen_width / 2.5, y=screen_height/2 + lines_nr * lines_nr / 6)
     done_button.configure(background=SPICY_MIX, foreground=ANTI_FLASH_WHITE)
 #start_window_thread()
 #show_game_logs("m\np\n\nt\np\np\np\n\ns\np\n")
